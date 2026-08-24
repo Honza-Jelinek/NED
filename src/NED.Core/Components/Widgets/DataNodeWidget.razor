@@ -1,0 +1,162 @@
+@namespace NED.Core
+@using NED.Abstractions.Manifest
+@* Univerzální widget pro všechny typy uzlů z manifestu.
+   Vstupy (InputDefs) se renderují jako port (linkovatelný) nebo pole (inline konstanta)
+   podle aktuální expozice. Pravý klik na vstup → přepnutí port↔pole (přes bridge). *@
+@inject NedTheme Theme
+@inject NedCatalog Catalog
+@inject IStringLocalizer<Strings> Loc
+
+@{
+    IReadOnlyList<ValidationIssue> issues = Bridge?.IssuesFor(Node) ?? Array.Empty<ValidationIssue>();
+    var hasError = issues.Any(i => i.Severity == IssueSeverity.Error);
+    var hasWarn = issues.Any(i => i.Severity == IssueSeverity.Warning);
+    var vCls = hasError ? " node-invalid" : hasWarn ? " node-warn" : "";
+    var rootCls = $"data-node dn-cat-{Slug(Node.Descriptor.Category)}{(Node.Selected ? " node-selected" : "")}{vCls}";
+}
+
+<div class="@rootCls">
+
+    @if (issues.Count > 0)
+    {
+        <NedTooltip Description="@IssueText(issues)" Placement="Placement.Right">
+            <div class="dn-badge @(hasError ? "dn-badge-err" : "dn-badge-warn")">@issues.Count</div>
+        </NedTooltip>
+    }
+
+    @* ── Header (s gradient stripem dole jako NodeShell) ── *@
+    <NedTooltip Description="@HeaderTip" Placement="Placement.Top">
+        <div class="dn-header" style="@HeaderStyle">
+            <span class="dn-icon">@Style.Icon</span>
+            <span class="dn-title">@Node.Descriptor.Name</span>
+        </div>
+    </NedTooltip>
+
+    @{
+        var portInputs = Node.InputDefs.Where(i => i.AsPort)
+            .OrderByDescending(i => i.DataType == TypeIds.Exec).ToList();
+        // Details pole se renderují jen v Details panelu, ne inline na nodu.
+        var fieldInputs = Node.InputDefs.Where(i => !i.AsPort && !i.Details).ToList();
+    }
+
+    @* ── Porty: inputy vlevo, output vpravo ─────────── *@
+    @if (portInputs.Count > 0 || Node.Outputs.Count > 0)
+    {
+        <div class="dn-ports" @onmousedown:stopPropagation>
+            <div class="dn-inputs">
+                @foreach (var input in portInputs)
+                {
+                    var port = input.Port!;
+                    var color = PortColorFor(port);
+                    var isExec = input.DataType == TypeIds.Exec;
+                    var rowCls = "dn-port-row dn-in-row"
+                        + (isExec ? " dn-exec" : "")
+                        + (input.Multiple && !isExec ? " dn-array" : "")
+                        + (input.Optional ? " dn-optional" : "")
+                        + (port.Links.Count > 0 ? " dn-conn" : "");
+                    <NedTooltip TypeLine="@port.TypeLine" Description="@port.Description" Placement="Placement.Left">
+                        <div class="@rowCls" style="--pc:@color"
+                             @oncontextmenu="e => OpenInputMenu(input, e)"
+                             @oncontextmenu:stopPropagation="input.Togglable"
+                             @oncontextmenu:preventDefault="true">
+                            <PortRenderer Port="port" />
+                            <span class="dn-port-label">@input.Label@(input.Multiple && !isExec ? " []" : "")</span>
+                        </div>
+                    </NedTooltip>
+                }
+            </div>
+            <div class="dn-outputs">
+                @foreach (var (name, output) in Node.Outputs
+                    .OrderByDescending(item => item.Value.DataType == TypeIds.Exec))
+                {
+                    var outCls = "dn-port-row dn-out-row"
+                        + (output.DataType == TypeIds.Exec ? " dn-exec" : "")
+                        + (output.Links.Count > 0 ? " dn-conn" : "");
+                    <NedTooltip TypeLine="@output.TypeLine" Description="@output.Description" Placement="Placement.Right">
+                        <div class="@outCls" style="--pc:@PortColorFor(output)">
+                            @if (Node.Outputs.Count > 1)
+                            {
+                                @* Jméno má smysl jen tam, kde je z čeho vybírat.
+                                   U jediného výstupu je to text navíc na každém uzlu v grafu. *@
+                                <span class="dn-port-label">@name</span>
+                            }
+                            <PortRenderer Port="output" />
+                        </div>
+                    </NedTooltip>
+                }
+            </div>
+        </div>
+    }
+
+    @* ── Pole (vstupy ve field režimu) ──────────────── *@
+    @if (fieldInputs.Count > 0)
+    {
+        <div class="dn-body" @onmousedown:stopPropagation>
+            @foreach (var input in fieldInputs)
+            {
+                <NedTooltip TypeLine="@FieldTypeLine(input)" Description="@input.Description" Placement="Placement.Left">
+                    <div class="dn-field @(input.DataType == TypeIds.Bool ? "dn-field-check" : "")"
+                         @oncontextmenu="e => OpenInputMenu(input, e)"
+                         @oncontextmenu:stopPropagation="input.Togglable"
+                         @oncontextmenu:preventDefault="true">
+                        <label class="dn-field-label">@input.Label</label>
+                        <NodeFieldInput TypeId="@input.DataType"
+                                        IsTypePicker="input.TypePicker" IsComplex="input.Complex"
+                                        Value="@NodeFieldIO.Read(Node, input)"
+                                        OnChange="v => NodeFieldIO.Write(Node, input, v, Bridge?.RecordUndo, Bridge?.Revalidate)" />
+                    </div>
+                </NedTooltip>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public DataNodeModel Node { get; set; } = null!;
+
+    /// <summary>Můstek do NedCanvas (otevření kontext menu vstupu). Cascaduje se shora.</summary>
+    [CascadingParameter] public NodeEditorBridge? Bridge { get; set; }
+
+    private NodeStyle Style => Theme.Resolve(Node.Descriptor);
+
+    private string IssueText(IReadOnlyList<ValidationIssue> issues) =>
+        string.Join("\n", issues.Select(i => i.Args is { Length: > 0 }
+            ? string.Format(Loc[i.MessageKey], i.Args)
+            : Loc[i.MessageKey].Value));
+
+    // Plochá hlavička používá barvu kategorie bez světelných efektů.
+    private string HeaderStyle => $"background-color:{Style.Color};";
+
+    private static string Slug(string s) =>
+        new string(s.ToLowerInvariant().Select(c => char.IsLetterOrDigit(c) ? c : '-').ToArray());
+
+    private string PortColorFor(PortModel port)
+    {
+        var dt = (port as TypedPortModel)?.DataType;
+        if (dt is null) return Style.Color;
+        var c = Theme.PortColorFor(dt);
+        if (c != Theme.AnyPortColor) return c;
+
+        // Doménový typ (Perk, Equipment…) — použij barvu jeho kategorie, ne vlastnícího uzlu.
+        if (Catalog.Resolve(dt) is { } producer) return Theme.Resolve(producer).Color;
+
+        return Style.Color;
+    }
+
+    // Pravý klik na vstup → požádej NedCanvas o kontext menu (přepnutí port↔pole).
+    private void OpenInputMenu(NodeInput input, MouseEventArgs e)
+    {
+        if (!input.Togglable || Bridge is null) return;
+        Bridge.OpenInputMenu(input.AsPort, () => Node.SetExposure(input, !input.AsPort), e.ClientX, e.ClientY);
+    }
+
+    private string? HeaderTip => Node.Descriptor.Description;
+
+    private static string FieldTypeLine(NodeInput input)
+    {
+        var tip = $"{input.Label}: {TypeIds.Friendly(input.DataType)}";
+        if (input.HasExplicitDefault) tip += $"  •  default: {ValueFormat.ToDisplayValue(input.DefaultValue)}";
+        return tip;
+    }
+
+}

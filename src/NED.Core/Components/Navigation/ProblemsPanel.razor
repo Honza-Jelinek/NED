@@ -1,0 +1,77 @@
+@namespace NED.Core
+@* IDE-style Problems panel: validační chyby aktivního tabu (auto-refresh) + operační
+   chyby/varování (import/export/save/asset IO, trvalé do ručního Clear). Data čte
+   z ProblemsService (scoped), protože panel žije v portal vrstvě mimo cascading
+   scope NedCanvasu — stejný vzor jako DetailsPanel/NodeInspector. *@
+@inject ProblemsService Problems
+@inject IStringLocalizer<Strings> Loc
+@implements IDisposable
+
+<div class="pp-panel">
+    <div class="pp-header">
+        @if (Problems.ErrorCount > 0)
+        {
+            <span class="pp-count pp-count-error">⛔ @Problems.ErrorCount</span>
+        }
+        @if (Problems.WarningCount > 0)
+        {
+            <span class="pp-count pp-count-warning">⚠ @Problems.WarningCount</span>
+        }
+        <span class="pp-spacer"></span>
+        <button class="pp-clear" disabled="@(Problems.OperationEntries.Count == 0)" @onclick="() => Problems.ClearOperations()">
+            @Loc["Problems_ClearAll"]
+        </button>
+    </div>
+
+    @if (Problems.ValidationEntries.Count == 0 && Problems.OperationEntries.Count == 0)
+    {
+        <div class="pp-empty">@Loc["Problems_Empty"]</div>
+    }
+    else
+    {
+        <div class="pp-list">
+            @foreach (var e in Problems.ValidationEntries.OrderBy(e => e.Severity == NedNoticeSeverity.Error ? 0 : 1))
+            {
+                @RenderRow(e)
+            }
+            @foreach (var e in Problems.OperationEntries)
+            {
+                @RenderRow(e)
+            }
+        </div>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized() => Problems.Changed += OnChanged;
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    private string Localize(ProblemEntry e) =>
+        e.Args is { Length: > 0 } ? string.Format(Loc[e.MessageKey], e.Args) : Loc[e.MessageKey].Value;
+
+    private async Task OnRowClick(ProblemEntry e)
+    {
+        if (Problems.ExecuteAction is { } exec) await exec(e);
+    }
+
+    private RenderFragment RenderRow(ProblemEntry e) => @<div class="pp-row" @onclick="() => OnRowClick(e)">
+        <span class="pp-icon">@(e.Severity switch { NedNoticeSeverity.Error => "⛔", NedNoticeSeverity.Warning => "⚠", _ => "ℹ" })</span>
+        <span class="pp-message">@Localize(e)</span>
+        <span class="pp-source">@Loc[e.Source == ProblemSource.Validation ? "Problems_Source_Validation" : "Problems_Source_Operation"]</span>
+        @if (e.Action is CreateMissingSubgraphAction)
+        {
+            <button class="pp-action" @onclick="() => OnRowClick(e)" @onclick:stopPropagation="true">@Loc["Problems_Action_CreateSubgraph"]</button>
+        }
+        @if (e.Action is CreateMissingTemplateAction)
+        {
+            <button class="pp-action" @onclick="() => OnRowClick(e)" @onclick:stopPropagation="true">@Loc["Problems_Action_CreateTemplate"]</button>
+        }
+        @if (e.Source == ProblemSource.Operation)
+        {
+            <button class="pp-remove" @onclick="() => Problems.RemoveOperation(e.Id)" @onclick:stopPropagation="true">✕</button>
+        }
+    </div>;
+
+    public void Dispose() => Problems.Changed -= OnChanged;
+}

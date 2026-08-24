@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="xml:space" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>1.3</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="File_New" xml:space="preserve"><value>नया</value></data>
+  <data name="File_Save" xml:space="preserve"><value>सहेजें</value></data>
+  <data name="Cancel" xml:space="preserve"><value>रद्द करें</value></data>
+  <data name="NedMenuBar_File" xml:space="preserve"><value>फ़ाइल</value></data>
+  <data name="NedMenuBar_Edit" xml:space="preserve"><value>संपादित करें</value></data>
+  <data name="NedMenuBar_Window" xml:space="preserve"><value>विंडो</value></data>
+  <data name="Window_Language" xml:space="preserve"><value>भाषा</value></data>
+  <data name="File_Open" xml:space="preserve"><value>खोलें</value></data>
+  <data name="File_SaveAs" xml:space="preserve"><value>अन्य 이름으로 सहेजें…</value></data>
+  <data name="File_Export" xml:space="preserve"><value>निर्यात करें</value></data>
+  <data name="File_ManageLibraries" xml:space="preserve"><value>लाइब्रेरी प्रबंधित करें</value></data>
+  <data name="Edit_Undo" xml:space="preserve"><value>アンドゥ</value></data>
+  <data name="Edit_Redo" xml:space="preserve"><value>アンドゥー</value></data>
+  <data name="ManageLibraries_Info1" xml:space="preserve"><value>लाइब्रेरी ऐसे फ़ोल्डर हैं जो स्कैन किए जाते हैं</value></data>
+  <data name="ManageLibraries_Info2" xml:space="preserve"><value>इंडेक्स किए गए सबग्राफ़ पैलेट में दिखाई देंगे。</value></data>
+  <data name="ManageLibraries_NoLibrary" xml:space="preserve"><value>अभी कोई लाइब्रेरी नहीं。</value></data>
+  <data name="ManageLibraries_FolderPath" xml:space="preserve"><value>फ़ोल्डर पथ</value></data>
+  <data name="ManageLibraries_Browse" xml:space="preserve"><value>ブラウズ करें</value></data>
+  <data name="ManageLibraries_Add" xml:space="preserve"><value>जोड़ें</value></data>
+  <data name="HomeScreen_Subtitle" xml:space="preserve"><value>नया ग्राफ़ बनाएँ या मौजूदा फ़ाइल खोलें</value></data>
+  <data name="HomeScreen_NewGraphTitle" xml:space="preserve"><value>नया ग्राफ़</value></data>
+  <data name="HomeScreen_NewGraphDesc" xml:space="preserve"><value>एक खाली कैनवास बनाएँ</value></data>
+  <data name="HomeScreen_OpenFileTitle" xml:space="preserve"><value>फ़ाइल खोलें</value></data>
+  <data name="HomeScreen_OpenFileDesc" xml:space="preserve"><value>मौजूदा डायग्राम लोड करें</value></data>
+  <data name="TextPromptDialog_Label" xml:space="preserve"><value>लेबल</value></data>
+  <data name="TextPromptDialog_OkText" xml:space="preserve"><value>ठीक है</value></data>
+  <data name="TextPromptDialog_Cancel" xml:space="preserve"><value>रद्द करें</value></data>
+  <data name="PortContextMenu_ConvertToField" xml:space="preserve"><value>फ़ील्ड में बदलें</value></data>
+  <data name="PortContextMenu_ConvertToPort" xml:space="preserve"><value>पोर्ट में बदलें</value></data>
+  <data name="NodeContextMenu_Duplicate" xml:space="preserve"><value>दोहरा करें</value></data>
+  <data name="NodeContextMenu_Refresh" xml:space="preserve"><value>ताज़ा करें</value></data>
+  <data name="NodeContextMenu_Delete" xml:space="preserve"><value>हटाएँ</value></data>
+  <data name="InstanceEditor_Instance" xml:space="preserve"><value>इंस्टेंस</value></data>
+  <data name="InstanceEditor_NameLabel" xml:space="preserve"><value>नाम</value></data>
+  <data name="InstanceEditor_NamePlaceholder" xml:space="preserve"><value>वैकल्पिक</value></data>
+  <data name="InstanceEditor_TemplateNotFound" xml:space="preserve"><value>लाइब्रेरी में टेम्पलेट नहीं मिला。</value></data>
+  <data name="InstanceEditor_NoInputs" xml:space="preserve"><value>इस टेम्पलेट में कोई इनपुट पैरामीटर नहीं हैं।</value></data>
+  <data name="Validation_MissingType" xml:space="preserve"><value>नोड प्रकार अनुपलब्ध: {0}</value></data>
+  <data name="MissingNode_MissingType" xml:space="preserve"><value>अनुपलब्ध प्रकार</value></data>
+  <data name="Notice_SaveFailed" xml:space="preserve"><value>"{0}" सहेजना विफल रहा।</value></data>
+  <data name="Notice_ExportFailed" xml:space="preserve"><value>"{0}" का निर्यात विफल रहा।</value></data>
+  <data name="Notice_FileReadFailed" xml:space="preserve"><value>"{0}" पढ़ी नहीं जा सकी — यह क्षतिग्रस्त हो सकती है।</value></data>
+  <data name="ManagePacks_Section" xml:space="preserve"><value>नोड पैक</value></data>
+  <data name="ManagePacks_AddFromFile" xml:space="preserve"><value>फ़ाइल से जोड़ें…</value></data>
+  <data name="ManagePacks_Info" xml:space="preserve"><value>पैलेट में उपलब्ध नोड प्रकारों का वर्णन करने वाले मेनिफ़ेस्ट।</value></data>
+  <data name="ManagePacks_Regenerate" xml:space="preserve"><value>फिर से जनरेट करें</value></data>
+  <data name="ManagePacks_Generator" xml:space="preserve"><value>जनरेटर</value></data>
+  <data name="ManagePacks_Generate" xml:space="preserve"><value>प्रोजेक्ट से जनरेट करें…</value></data>
+  <data name="ManagePacks_Generating" xml:space="preserve"><value>नोड पैक जनरेट हो रहा है…</value></data>
+  <data name="ManagePacks_TrustTitle" xml:space="preserve"><value>क्या इस प्रोजेक्ट पर भरोसा है?</value></data>
+  <data name="ManagePacks_TrustMessage" xml:space="preserve"><value>"{0}" का बिल्ड कस्टम चरण और नोड कंस्ट्रक्टर चला सकता है। केवल विश्वसनीय स्रोत के साथ जारी रखें।</value></data>
+  <data name="ManagePacks_GenerationFailed" xml:space="preserve"><value>नोड पैक जनरेशन विफल रहा।</value></data>
+  <data name="ManagePacks_InvalidManifest" xml:space="preserve"><value>जनरेटर ने वैध गैर-खाली मेनिफ़ेस्ट नहीं बनाया।</value></data>
+  <data name="ManagePacks_Generated" xml:space="preserve"><value>पैक "{0}" जनरेट हुआ ({1} प्रकार)।</value></data>
+  <data name="ManagePacks_Cancelled" xml:space="preserve"><value>जनरेशन रद्द किया गया।</value></data>
+  <data name="ManagePacks_TypeCount" xml:space="preserve"><value>{0} प्रकार</value></data>
+  <data name="ManagePacks_None" xml:space="preserve"><value>कोई अतिरिक्त पैक नहीं — केवल संपादक के अंतर्निहित नोड लोड हैं।</value></data>
+  <data name="Notice_AssetReadFailed" xml:space="preserve"><value>एसेट "{0}" पढ़ा नहीं जा सका — छोड़ दिया गया।</value></data>
+  <data name="Notice_NewerSchema" xml:space="preserve"><value>फ़ाइल "{0}" संपादक के नए संस्करण से आई है (स्कीमा {1})। सहेजने पर कुछ डेटा खो सकता है।</value></data>
+  <data name="Notice_DuplicateOutputName" xml:space="preserve"><value>नोड प्रकार "{0}" आउटपुट "{1}" को एक से अधिक बार घोषित करता है — केवल पहला उपयोग होगा।</value></data>
+  <data name="Notice_ExecMustBePort" xml:space="preserve"><value>नोड प्रकार "{0}" exec इनपुट "{1}" को फ़ील्ड या विवरण के रूप में घोषित करता है। इसे पोर्ट के रूप में लोड किया गया।</value></data>
+  <data name="Notice_PackConflict" xml:space="preserve"><value>नोड पैक "{0}" दो बार लोड है — दूसरी प्रति अनदेखी की गई।</value></data>
+  <data name="Notice_TypeConflict" xml:space="preserve"><value>नोड प्रकार "{0}" को "{1}" और "{2}" दोनों घोषित करते हैं — "{1}" वाला उपयोग होगा।</value></data>
+  <data name="Notice_PackLoadFailed" xml:space="preserve"><value>नोड पैक "{0}" लोड नहीं हो सका ({1}) — उसके नोड प्लेसहोल्डर के रूप में दिखेंगे।</value></data>
+  <data name="Notice_ManifestVersionNewer" xml:space="preserve"><value>मैनिफ़ेस्ट "{0}" स्कीमा संस्करण {1} का उपयोग करता है; यह संपादक संस्करण {2} का समर्थन करता है। ज्ञात फ़ील्ड लोड किए गए।</value></data>
+  <data name="Notice_PackWatchFailed" xml:space="preserve"><value>नोड पैक "{0}" में बदलावों की निगरानी नहीं की जा सकती ({1})।</value></data>
+  <data name="Notice_MissingPack" xml:space="preserve"><value>नोड पैक "{0}" लोड नहीं है — "{1}" में उसके नोड प्लेसहोल्डर के रूप में दिखेंगे।</value></data>
+  <data name="Notice_DeleteFailed" xml:space="preserve"><value>"{0}" हटाना विफल रहा।</value></data>
+  <data name="Notice_DuplicateFailed" xml:space="preserve"><value>"{0}" की नकल बनाना विफल रहा।</value></data>
+  <data name="Notice_DuplicateIdRepaired" xml:space="preserve"><value>डुप्लिकेट एसेट ID मिली — "{0}" को नई ID दी गई।</value></data>
+  <data name="Notice_DuplicateIdUnrepaired" xml:space="preserve"><value>"{0}" में डुप्लिकेट ID मिली, लेकिन उसे ठीक नहीं किया जा सका (फ़ाइल लॉक्ड या रीड-ओनली है)।</value></data>
+  <data name="DetailsPanel_ExportFormat" xml:space="preserve"><value>निर्यात प्रारूप</value></data>
+  <data name="Validation_MissingTemplate" xml:space="preserve"><value>इस इंस्टेंस का टेम्पलेट गुम है: {0}</value></data>
+  <data name="Notice_Saved" xml:space="preserve"><value>सहेजा गया: {0}</value></data>
+  <data name="Notice_ExportMissingSubgraph" xml:space="preserve"><value>निर्यात: सबग्राफ "{0}" गुम है</value></data>
+  <data name="Notice_ExportSubgraphLoadFailed" xml:space="preserve"><value>निर्यात: सबग्राफ "{0}" लोड नहीं किया जा सका</value></data>
+  <data name="Notice_SubgraphCreated" xml:space="preserve"><value>सबग्राफ "{0}" बनाया गया</value></data>
+  <data name="Notice_SubgraphCreateFailed" xml:space="preserve"><value>सबग्राफ "{0}" नहीं बनाया जा सका</value></data>
+  <data name="Notice_TemplateCreated" xml:space="preserve"><value>टेम्पलेट "{0}" बनाया गया</value></data>
+  <data name="Notice_TemplateCreateFailed" xml:space="preserve"><value>टेम्पलेट "{0}" नहीं बनाया जा सका</value></data>
+  <data name="Dialog_CreateTemplate" xml:space="preserve"><value>गुम टेम्पलेट बनाएं</value></data>
+  <data name="Problems_Action_CreateTemplate" xml:space="preserve"><value>टेम्पलेट बनाएं…</value></data>
+  <data name="Problems_Empty" xml:space="preserve"><value>कोई समस्या नहीं मिली</value></data>
+  <data name="Problems_ClearAll" xml:space="preserve"><value>साफ़ करें</value></data>
+  <data name="Problems_Source_Validation" xml:space="preserve"><value>सत्यापन</value></data>
+  <data name="Problems_Source_Operation" xml:space="preserve"><value>ऑपरेशन</value></data>
+  <data name="Problems_Action_CreateSubgraph" xml:space="preserve"><value>सबग्राफ बनाएं…</value></data>
+  <data name="Dialog_CreateSubgraph" xml:space="preserve"><value>गुम सबग्राफ बनाएं</value></data>
+  <data name="Dialog_CreateSubgraph_Name" xml:space="preserve"><value>नाम</value></data>
+  <data name="Dialog_CreateSubgraph_Location" xml:space="preserve"><value>लाइब्रेरी</value></data>
+  <data name="Dialog_CreateSubgraph_NoRoots" xml:space="preserve"><value>पहले एक लाइब्रेरी फ़ोल्डर जोड़ें (फ़ाइल ▸ लाइब्रेरी प्रबंधित करें)</value></data>
+  <data name="Dialog_Create" xml:space="preserve"><value>बनाएं</value></data>
+</root>

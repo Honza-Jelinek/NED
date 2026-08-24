@@ -1,0 +1,38 @@
+@namespace NED.Core
+@using NED.Abstractions.Manifest
+@* Panelová prezentace nastavení nodu: pro každé pole label nad NodeFieldInputem.
+   Čtení/zápis přes sdílený NodeFieldIO — stejná logika jako inline na nodu. *@
+
+@if (Node is not null && Fields.Count > 0)
+{
+    <div class="nfe-list">
+        @foreach (var input in Fields)
+        {
+            <div class="nfe-field @(input.DataType == TypeIds.Bool ? "nfe-field-check" : "")">
+                <label class="nfe-label">@input.Label</label>
+                <NodeFieldInput TypeId="@input.DataType"
+                                IsTypePicker="input.TypePicker" IsComplex="input.Complex"
+                                Value="@NodeFieldIO.Read(Node, input)"
+                                OnChange="v => OnChange(input, v)" />
+                @if (!string.IsNullOrEmpty(input.Description))
+                {
+                    <div class="nfe-desc">@input.Description</div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public DataNodeModel? Node { get; set; }
+    [Parameter] public IReadOnlyList<NodeInput> Fields { get; set; } = Array.Empty<NodeInput>();
+    [Parameter] public Action? RecordUndo { get; set; }
+    [Parameter] public Action? Revalidate { get; set; }
+
+    private void OnChange(NodeInput input, object? raw)
+    {
+        if (Node is null) return;
+        NodeFieldIO.Write(Node, input, raw, RecordUndo, Revalidate);
+        StateHasChanged();
+    }
+}

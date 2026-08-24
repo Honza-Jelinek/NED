@@ -1,0 +1,99 @@
+@namespace NED.Core
+@* Sdílený inline editor jednoho pole: text / number / bool / enum / type-picker / complex dropdown.
+   Pracuje se string hodnotou — konverze na typ řeší ValueFormat u volajícího. *@
+@using NED.Abstractions.Manifest
+@inject NedCatalog Catalog
+@inject AssetIndex AssetIndex
+
+@if (IsTypePicker)
+{
+    <select class="dn-input" value="@Value" @onchange="e => Changed(e.Value)">
+        @foreach (var ot in Catalog.SelectableTypes())
+        {
+            <option value="@ot">@TypeIds.Friendly(ot)</option>
+        }
+    </select>
+}
+else if (ShowComplex)
+{
+    <select class="dn-input" value="@Value" @onchange="e => Changed(e.Value)">
+        <option value="">— vyber —</option>
+        @foreach (var ct in MatchingTypes())
+        {
+            <option value="@ct.Id">@ct.Name</option>
+        }
+        @foreach (var sg in MatchingSubgraphs())
+        {
+            <option value="sg:@sg.Id">⧉ @sg.Name</option>
+        }
+    </select>
+}
+else if (EnumValues is { Count: > 0 })
+{
+    <select class="dn-input" value="@Value" @onchange="e => Changed(e.Value)">
+        @foreach (var v in EnumValues)
+        {
+            <option value="@v">@v</option>
+        }
+    </select>
+}
+else if (TypeId == TypeIds.Bool)
+{
+    <input class="dn-check" type="checkbox"
+           checked="@(Value is "True" or "true")"
+           @onchange="e => Changed(e.Value)" />
+}
+else if (TypeIds.IsNumeric(TypeId))
+{
+    <input class="dn-input" type="number" value="@Value"
+           @onchange="e => Changed(e.Value)" />
+}
+else
+{
+    <input class="dn-input" type="text" value="@Value"
+           @onchange="e => Changed(e.Value)" />
+}
+
+@code {
+    /// <summary>Type id editovaného pole (viz <see cref="TypeIds"/>).</summary>
+    [Parameter] public string TypeId { get; set; } = TypeIds.String;
+
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<object?> OnChange { get; set; }
+
+    [Parameter] public bool IsTypePicker { get; set; }
+    [Parameter] public bool IsComplex { get; set; }
+
+    /// <summary>Další GUID k vyloučení z dropdown nabídky (self-reference subgraf uzlu).</summary>
+    [Parameter] public Guid? ExcludeSubgraphId { get; set; }
+
+    [CascadingParameter] public NodeEditorBridge? Bridge { get; set; }
+
+    private IReadOnlyList<string>? EnumValues => Catalog.EnumValues(TypeId);
+
+    /// <summary>
+    /// Enum je uzavřený výčet hodnot, ne doménový typ — dropdown hodnot vyhrává nad
+    /// dropdownem producentů.
+    ///
+    /// Volající počítá <c>IsComplex</c> jako „není to skalár", což enum splňuje; komplexní
+    /// větev pak hledá uzly a subgrafy produkující <c>pack/MujEnum</c>, žádné nenajde
+    /// a nabídka vyjde prázdná. Rozhoduje se to tady, protože katalog má jen tenhle widget.
+    /// </summary>
+    private bool ShowComplex => IsComplex && EnumValues is null;
+
+    private async Task Changed(object? raw) => await OnChange.InvokeAsync(raw);
+
+    /// <summary>Typy, jejichž výstup lze do tohohle pole dosadit (včetně polymorfie).</summary>
+    private IEnumerable<NodeTypeDescriptor> MatchingTypes() =>
+        Catalog.AllTypes.Where(t => NedCatalog.OutputTypesOf(t)
+            .Any(outputType => Catalog.IsCompatible(outputType, TypeId)));
+
+    private IEnumerable<AssetEntry> MatchingSubgraphs()
+    {
+        var selfId = Bridge?.CurrentGraphId() ?? Guid.Empty;
+        return AssetIndex.Subgraphs().Where(sg => sg.Id != selfId
+            && sg.Id != ExcludeSubgraphId
+            && sg.Interface.OutputType is not null
+            && Catalog.IsCompatible(sg.Interface.OutputType, TypeId));
+    }
+}

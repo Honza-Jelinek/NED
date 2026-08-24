@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="xml:space" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>1.3</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Czech translations -->
+  <data name="File_New" xml:space="preserve"><value>Nový</value></data>
+  <data name="File_Save" xml:space="preserve"><value>Uložit</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Zrušit</value></data>
+  <data name="Window_Language" xml:space="preserve"><value>Jazyk</value></data>
+  <data name="File_Open" xml:space="preserve"><value>Otevřít</value></data>
+  <data name="File_SaveAs" xml:space="preserve"><value>Uložit jako…</value></data>
+  <data name="File_Export" xml:space="preserve"><value>Exportovat</value></data>
+  <data name="File_ManageLibraries" xml:space="preserve"><value>Spravovat knihovny</value></data>
+  <data name="Edit_Undo" xml:space="preserve"><value>Zpět</value></data>
+  <data name="Edit_Redo" xml:space="preserve"><value>Opakovat</value></data>
+  <data name="Palette_Placeholder" xml:space="preserve"><value>Zadejte příkaz…</value></data>
+  <data name="File" xml:space="preserve"><value>Soubor</value></data>
+  <data name="Edit" xml:space="preserve"><value>Úpravy</value></data>
+  <data name="Window" xml:space="preserve"><value>Okno</value></data>
+  <data name="Navigate" xml:space="preserve"><value>Navigace</value></data>
+  <data name="Tabs" xml:space="preserve"><value>Karty</value></data>
+  <data name="Navigate_Back" xml:space="preserve"><value>Zpět</value></data>
+  <data name="Navigate_Forward" xml:space="preserve"><value>Vpřed</value></data>
+  <data name="Dialog_NewGraph" xml:space="preserve"><value>Nový graf</value></data>
+  <data name="Dialog_Libraries" xml:space="preserve"><value>Knihovny</value></data>
+  <data name="Dialog_Rename" xml:space="preserve"><value>Přejmenovat</value></data>
+  <data name="Dialog_Rename_Label" xml:space="preserve"><value>Nový název souboru</value></data>
+  <data name="Dialog_Error" xml:space="preserve"><value>Chyba</value></data>
+  <data name="Dialog_FileExists" xml:space="preserve"><value>Soubor s tímto názvem už existuje.</value></data>
+  <data name="Dialog_DeleteFile" xml:space="preserve"><value>Smazat soubor</value></data>
+  <data name="Dialog_DeleteInstance" xml:space="preserve"><value>Smazat instanci</value></data>
+  <data name="Dialog_Delete" xml:space="preserve"><value>Smazat</value></data>
+  <data name="Dialog_MoveToTrash" xml:space="preserve"><value>Přesunout „{0}" do koše?</value></data>
+  <data name="ManageLibraries_Info1" xml:space="preserve"><value>Knihovny jsou složky, které se skenují na</value></data>
+  <data name="ManageLibraries_Info2" xml:space="preserve"><value>Indexované subgrafy se objeví v paletě.</value></data>
+  <data name="ManageLibraries_NoLibrary" xml:space="preserve"><value>Zatím žádná knihovna.</value></data>
+  <data name="ManageLibraries_FolderPath" xml:space="preserve"><value>Cesta ke složce</value></data>
+  <data name="ManageLibraries_Browse" xml:space="preserve"><value>Procházet…</value></data>
+  <data name="ManageLibraries_Add" xml:space="preserve"><value>Přidat</value></data>
+  <data name="HomeScreen_Subtitle" xml:space="preserve"><value>Vytvořte nový graf nebo otevřete existující soubor</value></data>
+  <data name="HomeScreen_NewGraphTitle" xml:space="preserve"><value>Nový graf</value></data>
+  <data name="HomeScreen_NewGraphDesc" xml:space="preserve"><value>Vytvořit čisté plátno</value></data>
+  <data name="HomeScreen_OpenFileTitle" xml:space="preserve"><value>Otevřít soubor</value></data>
+  <data name="HomeScreen_OpenFileDesc" xml:space="preserve"><value>Načíst existující diagram</value></data>
+  <data name="TextPromptDialog_Label" xml:space="preserve"><value>Název</value></data>
+  <data name="TextPromptDialog_OkText" xml:space="preserve"><value>OK</value></data>
+  <data name="TextPromptDialog_Cancel" xml:space="preserve"><value>Zrušit</value></data>
+  <data name="PortContextMenu_ConvertToField" xml:space="preserve"><value>Převést na pole</value></data>
+  <data name="PortContextMenu_ConvertToPort" xml:space="preserve"><value>Převést na port</value></data>
+  <data name="NodeContextMenu_Duplicate" xml:space="preserve"><value>Duplikovat</value></data>
+  <data name="NodeContextMenu_Refresh" xml:space="preserve"><value>Obnovit</value></data>
+  <data name="NodeContextMenu_Delete" xml:space="preserve"><value>Smazat</value></data>
+  <data name="UnsavedChanges_Title" xml:space="preserve"><value>Neuložené změny</value></data>
+  <data name="UnsavedChanges_Message" xml:space="preserve"><value>„{0}" obsahuje neuložené změny. Uložit?</value></data>
+  <data name="UnsavedChanges_Save" xml:space="preserve"><value>Uložit</value></data>
+  <data name="UnsavedChanges_Discard" xml:space="preserve"><value>Zahodit</value></data>
+  <data name="InstanceEditor_Instance" xml:space="preserve"><value>Instance</value></data>
+  <data name="InstanceEditor_NameLabel" xml:space="preserve"><value>Název</value></data>
+  <data name="InstanceEditor_NamePlaceholder" xml:space="preserve"><value>volitelné</value></data>
+  <data name="InstanceEditor_TemplateNotFound" xml:space="preserve"><value>Template nenalezen v knihovně.</value></data>
+  <data name="InstanceEditor_NoInputs" xml:space="preserve"><value>Tento template nemá žádné vstupní parametry.</value></data>
+  <data name="DetailsPanel_Empty" xml:space="preserve"><value>Vyber node pro úpravu nastavení.</value></data>
+  <data name="DetailsPanel_NoNodeSettings" xml:space="preserve"><value>Tento node nemá další nastavení.</value></data>
+  <data name="DetailsPanel_GraphSettings" xml:space="preserve"><value>Nastavení grafu</value></data>
+  <data name="DetailsPanel_GraphName" xml:space="preserve"><value>Název</value></data>
+  <data name="DetailsPanel_GraphDescription" xml:space="preserve"><value>Popis</value></data>
+  <data name="LibraryPanel_Title" xml:space="preserve"><value>Knihovny</value></data>
+  <data name="LibraryPanel_NoLibrary" xml:space="preserve"><value>Zatím žádná knihovna.</value></data>
+  <data name="LibraryPanel_Empty" xml:space="preserve"><value>prázdné</value></data>
+  <data name="LibraryPanel_EmptyItem" xml:space="preserve"><value>prázdné</value></data>
+  <data name="LibraryPanel_Manage" xml:space="preserve"><value>Spravovat knihovny</value></data>
+  <data name="LibraryPanel_NewInstance" xml:space="preserve"><value>Nová instance</value></data>
+  <data name="LibraryPanel_OpenInExplorer" xml:space="preserve"><value>Otevřít v Průzkumníku</value></data>
+  <data name="LibraryPanel_OpenInEditor" xml:space="preserve"><value>Otevřít ve VS Code</value></data>
+  <data name="LibraryPanel_Rename" xml:space="preserve"><value>Přejmenovat</value></data>
+  <data name="LibraryPanel_Duplicate" xml:space="preserve"><value>Duplikovat</value></data>
+  <data name="LibraryPanel_Delete" xml:space="preserve"><value>Smazat</value></data>
+  <data name="LibraryPanel_OpenInstance" xml:space="preserve"><value>Otevřít</value></data>
+  <data name="Validation_NoOutput" xml:space="preserve"><value>Datový graf nedeklaruje žádný výstup</value></data>
+  <data name="Validation_NoExecEntry" xml:space="preserve"><value>Exec graf nemá uzel Exec Entry</value></data>
+  <data name="Validation_MultipleExecEntries" xml:space="preserve"><value>Exec graf má více než jeden uzel Exec Entry</value></data>
+  <data name="Validation_OneOutputNode" xml:space="preserve"><value>Datový graf potřebuje právě jeden uzel Output</value></data>
+  <data name="Validation_OutputNodeInExecGraph" xml:space="preserve"><value>Uzel Output do exec grafu nepatří; hodnoty vracejí uzly Return</value></data>
+  <data name="Validation_NoReturn" xml:space="preserve"><value>Exec subgraf deklaruje výstupy, ale nemá uzel Return</value></data>
+  <data name="Validation_ExecNodeInDataGraph" xml:space="preserve"><value>Řídicí uzel „{0}" do datového grafu nepatří</value></data>
+  <data name="Validation_DuplicateParameter" xml:space="preserve"><value>Duplicitní název parametru grafu: {0}</value></data>
+  <data name="Validation_OutputEmpty" xml:space="preserve"><value>Output není připojený</value></data>
+  <data name="Validation_RequiredInput" xml:space="preserve"><value>Povinný vstup „{0}" není připojený</value></data>
+  <data name="Validation_StaleSubgraph" xml:space="preserve"><value>Subgraf „{0}" nenalezen v knihovně</value></data>
+  <data name="Validation_BrokenLink" xml:space="preserve"><value>Nekompatibilní propojení (neshoda typů)</value></data>
+  <data name="Validation_Orphan" xml:space="preserve"><value>Node není napojený na žádný výstup (nevyužitý)</value></data>
+  <data name="Validation_DeadExecPath" xml:space="preserve"><value>Exec cesta končí na pinu „{0}“ bez Return</value></data>
+  <data name="Validation_MissingType" xml:space="preserve"><value>Chybějící typ nodu: {0}</value></data>
+  <data name="MissingNode_MissingType" xml:space="preserve"><value>Chybějící typ</value></data>
+  <data name="Notice_SaveFailed" xml:space="preserve"><value>Uložení souboru „{0}" selhalo.</value></data>
+  <data name="Notice_ExportFailed" xml:space="preserve"><value>Export „{0}" selhal.</value></data>
+  <data name="Notice_FileReadFailed" xml:space="preserve"><value>Nepodařilo se přečíst „{0}" — může být poškozený.</value></data>
+  <data name="ManagePacks_Section" xml:space="preserve"><value>Node packy</value></data>
+  <data name="ManagePacks_AddFromFile" xml:space="preserve"><value>Přidat ze souboru…</value></data>
+  <data name="ManagePacks_Info" xml:space="preserve"><value>Manifesty popisující typy uzlů dostupné v paletě.</value></data>
+  <data name="ManagePacks_Regenerate" xml:space="preserve"><value>Přegenerovat</value></data>
+  <data name="ManagePacks_Generator" xml:space="preserve"><value>Generátor</value></data>
+  <data name="ManagePacks_Generate" xml:space="preserve"><value>Vygenerovat z projektu…</value></data>
+  <data name="ManagePacks_Generating" xml:space="preserve"><value>Generuji node pack…</value></data>
+  <data name="ManagePacks_TrustTitle" xml:space="preserve"><value>Důvěřovat tomuto projektu?</value></data>
+  <data name="ManagePacks_TrustMessage" xml:space="preserve"><value>Build projektu „{0}“ může spouštět vlastní build kroky a konstruktory nodů. Pokračujte jen u důvěryhodného zdroje.</value></data>
+  <data name="ManagePacks_GenerationFailed" xml:space="preserve"><value>Generování node packu selhalo.</value></data>
+  <data name="ManagePacks_InvalidManifest" xml:space="preserve"><value>Generátor nevytvořil platný neprázdný manifest.</value></data>
+  <data name="ManagePacks_Generated" xml:space="preserve"><value>Pack „{0}“ vygenerován ({1} typů).</value></data>
+  <data name="ManagePacks_Cancelled" xml:space="preserve"><value>Generování zrušeno.</value></data>
+  <data name="ManagePacks_TypeCount" xml:space="preserve"><value>{0} typů</value></data>
+  <data name="ManagePacks_None" xml:space="preserve"><value>Žádný pack navíc — načtené jsou jen vestavěné uzly editoru.</value></data>
+  <data name="Notice_AssetReadFailed" xml:space="preserve"><value>Nelze přečíst asset „{0}" — přeskočeno.</value></data>
+  <data name="Notice_NewerSchema" xml:space="preserve"><value>Soubor „{0}" pochází z novější verze editoru (schéma {1}). Při uložení se o něco můžeš připravit.</value></data>
+  <data name="Notice_DuplicateOutputName" xml:space="preserve"><value>Typ uzlu „{0}" deklaruje výstup „{1}" víckrát — použije se jen první.</value></data>
+  <data name="Notice_ExecMustBePort" xml:space="preserve"><value>Typ uzlu „{0}" deklaruje exec vstup „{1}" jako pole nebo detail. Byl načten jako port.</value></data>
+  <data name="Notice_PackConflict" xml:space="preserve"><value>Node pack „{0}" je načtený dvakrát — druhá kopie se ignoruje.</value></data>
+  <data name="Notice_TypeConflict" xml:space="preserve"><value>Typ uzlu „{0}" deklarují packy „{1}" i „{2}" — použije se ten z „{1}".</value></data>
+  <data name="Notice_PackLoadFailed" xml:space="preserve"><value>Node pack „{0}" se nepodařilo načíst ({1}) — jeho uzly se zobrazí jako placeholdery.</value></data>
+  <data name="Notice_ManifestVersionNewer" xml:space="preserve"><value>Manifest „{0}" používá schéma verze {1}; tento editor podporuje verzi {2}. Známá pole byla načtena.</value></data>
+  <data name="Notice_PackWatchFailed" xml:space="preserve"><value>Node pack „{0}" nelze sledovat kvůli změnám ({1}).</value></data>
+  <data name="Notice_MissingPack" xml:space="preserve"><value>Node pack „{0}" není načtený — uzly z něj se v „{1}" zobrazí jako placeholdery.</value></data>
+  <data name="Notice_DeleteFailed" xml:space="preserve"><value>Smazání „{0}" selhalo.</value></data>
+  <data name="Notice_DuplicateFailed" xml:space="preserve"><value>Duplikace „{0}" selhala.</value></data>
+  <data name="Notice_DuplicateIdRepaired" xml:space="preserve"><value>Nalezeno duplicitní ID assetu — „{0}" dostal nové ID.</value></data>
+  <data name="Notice_DuplicateIdUnrepaired" xml:space="preserve"><value>Nalezeno duplicitní ID assetu v „{0}", ale nepodařilo se ho opravit (soubor je zamčený nebo jen pro čtení).</value></data>
+  <data name="DetailsPanel_Instanceable" xml:space="preserve"><value>Lze instancovat</value></data>
+  <data name="DetailsPanel_GraphFlow" xml:space="preserve"><value>Tok</value></data>
+  <data name="DetailsPanel_GraphOutputs" xml:space="preserve"><value>Výstupy</value></data>
+  <data name="DetailsPanel_OutputList" xml:space="preserve"><value>Pole</value></data>
+  <data name="DetailsPanel_AddOutput" xml:space="preserve"><value>Přidat výstup</value></data>
+  <data name="DetailsPanel_RemoveOutput" xml:space="preserve"><value>Odebrat výstup</value></data>
+  <data name="DetailsPanel_MoveOutputUp" xml:space="preserve"><value>Posunout nahoru</value></data>
+  <data name="DetailsPanel_MoveOutputDown" xml:space="preserve"><value>Posunout dolů</value></data>
+  <data name="DetailsPanel_ExportFormat" xml:space="preserve"><value>Formát exportu</value></data>
+  <data name="Validation_MissingTemplate" xml:space="preserve"><value>Šablona této instance chybí: {0}</value></data>
+  <data name="Notice_Saved" xml:space="preserve"><value>Uloženo: {0}</value></data>
+  <data name="Notice_ExportMissingSubgraph" xml:space="preserve"><value>Export: chybí subgraf „{0}"</value></data>
+  <data name="Notice_ExportSubgraphLoadFailed" xml:space="preserve"><value>Export: nelze načíst subgraf „{0}"</value></data>
+  <data name="Notice_SubgraphCreated" xml:space="preserve"><value>Subgraf „{0}" byl vytvořen</value></data>
+  <data name="Notice_SubgraphCreateFailed" xml:space="preserve"><value>Nepodařilo se vytvořit subgraf „{0}"</value></data>
+  <data name="Notice_TemplateCreated" xml:space="preserve"><value>Šablona „{0}" byla vytvořena</value></data>
+  <data name="Notice_TemplateCreateFailed" xml:space="preserve"><value>Nepodařilo se vytvořit šablonu „{0}"</value></data>
+  <data name="Dialog_CreateTemplate" xml:space="preserve"><value>Vytvořit chybějící šablonu</value></data>
+  <data name="Problems_Action_CreateTemplate" xml:space="preserve"><value>Vytvořit šablonu…</value></data>
+  <data name="Problems_Empty" xml:space="preserve"><value>Žádné problémy</value></data>
+  <data name="Problems_ClearAll" xml:space="preserve"><value>Vymazat</value></data>
+  <data name="Problems_Source_Validation" xml:space="preserve"><value>Validace</value></data>
+  <data name="Problems_Source_Operation" xml:space="preserve"><value>Operace</value></data>
+  <data name="Problems_Action_CreateSubgraph" xml:space="preserve"><value>Vytvořit subgraf…</value></data>
+  <data name="Dialog_CreateSubgraph" xml:space="preserve"><value>Vytvořit chybějící subgraf</value></data>
+  <data name="Dialog_CreateSubgraph_Name" xml:space="preserve"><value>Název</value></data>
+  <data name="Dialog_CreateSubgraph_Location" xml:space="preserve"><value>Knihovna</value></data>
+  <data name="Dialog_CreateSubgraph_NoRoots" xml:space="preserve"><value>Nejdřív přidejte složku knihovny (Soubor ▸ Spravovat knihovny)</value></data>
+  <data name="Dialog_Create" xml:space="preserve"><value>Vytvořit</value></data>
+</root>

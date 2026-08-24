@@ -1,0 +1,44 @@
+@namespace NED.Core
+@inject IStringLocalizer<Strings> Loc
+@* Horní menu bar editoru — renderuje se ze stromu NedCommandRegistry. *@
+
+<MudAppBar Dense="true" Fixed="false" Color="MudBlazor.Color.Dark" Elevation="0" Class="ne-menubar">
+    @foreach (var root in _visibleRoots.Select(n => Commands.Find(n)).Where(r => r is not null).Cast<NedCommandNode>())
+    {
+        <MudMenu Label="@Label(root)" Dense="true" AnchorOrigin="Origin.BottomLeft">
+            @foreach (var child in root.Children.OrderBy(c => c.Order))
+            {
+                @if (child.IsGroup)
+                {
+                    <MudMenu Label="@Label(child)" Dense="true">
+                        @foreach (var sub in child.Children.OrderBy(s => s.Order))
+                        {
+                            <MudMenuItem OnClick="sub.Execute!" Icon="@sub.Icon"
+                                         Disabled="!sub.IsEnabled">@Label(sub)</MudMenuItem>
+                        }
+                    </MudMenu>
+                }
+                else
+                {
+                    <MudMenuItem OnClick="child.Execute!" Icon="@child.Icon"
+                                 Disabled="!child.IsEnabled">@Label(child)</MudMenuItem>
+                }
+            }
+        </MudMenu>
+    }
+
+    <MudSpacer />
+
+    <MudText Typo="Typo.caption" Class="ne-status-text" title="@StatusTooltip">@Status</MudText>
+</MudAppBar>
+
+@code {
+    [Parameter] public NedCommandRegistry Commands { get; set; } = default!;
+    [Parameter] public string Status { get; set; } = "";
+    [Parameter] public string? StatusTooltip { get; set; }
+
+    private static readonly string[] _visibleRoots = ["File", "Edit", "Window"];
+
+    private string Label(NedCommandNode n) =>
+        n.Localize ? Loc[NedCommandRegistry.KeyOf(n.FullPath)] : n.Name;
+}

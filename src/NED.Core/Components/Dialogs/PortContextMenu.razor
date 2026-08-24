@@ -1,0 +1,27 @@
+@namespace NED.Core
+@inject IStringLocalizer<Strings> Loc
+@* Kontext menu vstupu (pravý klik na port/pole) — přepnutí port ↔ pole. *@
+
+<div class="np-backdrop" @onclick="Close" @oncontextmenu="Close" @oncontextmenu:preventDefault="true"></div>
+
+<div class="nc-menu" style="left:@(Xpx)px; top:@(Ypx)px;" @onclick:stopPropagation
+     @oncontextmenu:preventDefault="true">
+    <div class="nc-item" @onclick="() => Pick()">
+        <span class="nc-ic">@(IsPort ? "▭" : "◉")</span>
+        @(IsPort ? Loc["PortContextMenu_ConvertToField"] : Loc["PortContextMenu_ConvertToPort"])
+    </div>
+</div>
+
+@code {
+    [Parameter] public double Xpx { get; set; }
+    [Parameter] public double Ypx { get; set; }
+
+    /// <summary>Aktuální režim vstupu — určuje text/akci.</summary>
+    [Parameter] public bool IsPort { get; set; }
+
+    [Parameter] public EventCallback OnToggle { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private async Task Pick() => await OnToggle.InvokeAsync();
+    private async Task Close() => await OnClose.InvokeAsync();
+}

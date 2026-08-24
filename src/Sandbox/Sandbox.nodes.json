@@ -1,0 +1,571 @@
+{
+  "ManifestVersion": 1,
+  "Pack": {
+    "Id": "sandbox",
+    "Name": "Sandbox node pack",
+    "Version": "1.0.0"
+  },
+  "Enums": [],
+  "Types": [
+    {
+      "Id": "sandbox/Add",
+      "Name": "Add",
+      "Category": "Math",
+      "Description": "Se\u010Dte dv\u011B \u010D\u00EDsla.",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "double",
+          "Description": "Se\u010Dte dv\u011B \u010D\u00EDsla.",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "A",
+          "Label": "A",
+          "Kind": "Port",
+          "Type": "double",
+          "Default": 0,
+          "HasExplicitDefault": false,
+          "Description": "Prvn\u00ED s\u010D\u00EDtanec",
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        },
+        {
+          "Name": "B",
+          "Label": "B",
+          "Kind": "Port",
+          "Type": "double",
+          "Default": 0,
+          "HasExplicitDefault": false,
+          "Description": "Druh\u00FD s\u010D\u00EDtanec",
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/And",
+      "Name": "And",
+      "Category": "Bool",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "bool",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "A",
+          "Label": "A",
+          "Kind": "Port",
+          "Type": "bool",
+          "Default": false,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        },
+        {
+          "Name": "B",
+          "Label": "B",
+          "Kind": "Port",
+          "Type": "bool",
+          "Default": false,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/Average",
+      "Name": "Average",
+      "Category": "Math",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "sandbox/Average",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "Values",
+          "Label": "Values",
+          "Kind": "Port",
+          "Type": "double",
+          "Default": 0,
+          "HasExplicitDefault": false,
+          "Multiple": true,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/BoolConstant",
+      "Name": "Bool",
+      "Category": "Bool",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "bool",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "Value",
+          "Label": "Value",
+          "Kind": "Field",
+          "Type": "bool",
+          "Default": false,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/Branch",
+      "Name": "Branch",
+      "Category": "Flow",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "True",
+          "Type": "exec",
+          "Multiple": false
+        },
+        {
+          "Name": "False",
+          "Type": "exec",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "In",
+          "Label": "In",
+          "Kind": "Port",
+          "Type": "exec",
+          "HasExplicitDefault": false,
+          "Multiple": true,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        },
+        {
+          "Name": "Cond",
+          "Label": "Cond",
+          "Kind": "Port",
+          "Type": "bool",
+          "Default": false,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/Concat",
+      "Name": "Concat",
+      "Category": "String",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "string",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "A",
+          "Label": "A",
+          "Kind": "Port",
+          "Type": "string",
+          "Default": "",
+          "HasExplicitDefault": true,
+          "Multiple": true,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/Divide",
+      "Name": "Divide",
+      "Category": "Math",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "double",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "A",
+          "Label": "A",
+          "Kind": "Port",
+          "Type": "double",
+          "Default": 0,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        },
+        {
+          "Name": "B",
+          "Label": "B",
+          "Kind": "Port",
+          "Type": "double",
+          "Default": 0,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/Loop",
+      "Name": "Loop",
+      "Category": "Flow",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Body",
+          "Type": "exec",
+          "Multiple": false,
+          "Role": "Subflow"
+        },
+        {
+          "Name": "Then",
+          "Type": "exec",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "In",
+          "Label": "In",
+          "Kind": "Port",
+          "Type": "exec",
+          "HasExplicitDefault": false,
+          "Multiple": true,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/Multiply",
+      "Name": "Multiply",
+      "Category": "Math",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "double",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "A",
+          "Label": "A",
+          "Kind": "Port",
+          "Type": "double",
+          "Default": 0,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        },
+        {
+          "Name": "B",
+          "Label": "B",
+          "Kind": "Port",
+          "Type": "double",
+          "Default": 0,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/Not",
+      "Name": "Not",
+      "Category": "Bool",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "bool",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "In",
+          "Label": "In",
+          "Kind": "Port",
+          "Type": "bool",
+          "Default": false,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/NumberConstant",
+      "Name": "Number",
+      "Category": "Math",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "double",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "Value",
+          "Label": "Value",
+          "Kind": "Field",
+          "Type": "double",
+          "Default": 0,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/Or",
+      "Name": "Or",
+      "Category": "Bool",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "bool",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "A",
+          "Label": "A",
+          "Kind": "Port",
+          "Type": "bool",
+          "Default": false,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        },
+        {
+          "Name": "B",
+          "Label": "B",
+          "Kind": "Port",
+          "Type": "bool",
+          "Default": false,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/Sequence",
+      "Name": "Sequence",
+      "Category": "Flow",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Then",
+          "Type": "exec",
+          "Multiple": false
+        },
+        {
+          "Name": "Next",
+          "Type": "exec",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "In",
+          "Label": "In",
+          "Kind": "Port",
+          "Type": "exec",
+          "HasExplicitDefault": false,
+          "Multiple": true,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/StringConstant",
+      "Name": "Text",
+      "Category": "String",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "string",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "Text",
+          "Label": "Text",
+          "Kind": "Field",
+          "Type": "string",
+          "Default": "",
+          "HasExplicitDefault": true,
+          "Multiple": false,
+          "Optional": true,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/Subtract",
+      "Name": "Subtract",
+      "Category": "Math",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "double",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "A",
+          "Label": "A",
+          "Kind": "Port",
+          "Type": "double",
+          "Default": 0,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        },
+        {
+          "Name": "B",
+          "Label": "B",
+          "Kind": "Port",
+          "Type": "double",
+          "Default": 0,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/Sum",
+      "Name": "Sum",
+      "Category": "Math",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "double",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "Values",
+          "Label": "Values",
+          "Kind": "Port",
+          "Type": "double",
+          "Default": 0,
+          "HasExplicitDefault": false,
+          "Multiple": true,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "sandbox/ToUpper",
+      "Name": "To Upper",
+      "Category": "String",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "string",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "In",
+          "Label": "In",
+          "Kind": "Port",
+          "Type": "string",
+          "Default": "",
+          "HasExplicitDefault": true,
+          "Multiple": false,
+          "Optional": true,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    }
+  ]
+}

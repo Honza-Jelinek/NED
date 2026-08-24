@@ -1,0 +1,197 @@
+﻿@namespace NED.Core
+@using NED.Abstractions.Manifest
+@using NED.Core.Manifest
+@* Details panel: nastavení vybraného nodu (Details pole přes sdílený NodeFieldEditor),
+   nebo graf-level nastavení při prázdném výběru. Data čte z NodeInspector (scoped),
+   protože panel žije v portal vrstvě mimo cascading scope NedCanvasu. *@
+@inject NodeInspector Inspector
+@inject IStringLocalizer<Strings> Loc
+@inject NedCatalog Catalog
+@inject NedTheme Theme
+@implements IDisposable
+
+<div class="dp-panel">
+    @if (Inspector.Node is { } node)
+    {
+        <div class="dp-header">
+            <span class="dp-icon">@Theme.Resolve(node.Descriptor).Icon</span>
+            <span>@node.Descriptor.Name</span>
+        </div>
+
+        @if (DetailFields(node) is { Count: > 0 } fields)
+        {
+            <div class="dp-body">
+                <NodeFieldEditor Node="node" Fields="fields"
+                                 RecordUndo="Inspector.Bridge?.RecordUndo"
+                                 Revalidate="Inspector.Bridge?.Revalidate" />
+            </div>
+        }
+        else
+        {
+            <div class="dp-empty">@Loc["DetailsPanel_NoNodeSettings"]</div>
+        }
+    }
+    else if (Inspector.Graph is { } graph)
+    {
+        <div class="dp-header">
+            <span class="dp-icon">⚙</span>
+            <span>@Loc["DetailsPanel_GraphSettings"]</span>
+        </div>
+        <div class="dp-body">
+            <div class="nfe-list">
+                <div class="nfe-field">
+                    <label class="nfe-label">@Loc["DetailsPanel_GraphName"]</label>
+                    <input class="dp-input" value="@graph.Name" @onchange="OnNameChange" />
+                </div>
+                <div class="nfe-field">
+                    <label class="nfe-label">@Loc["DetailsPanel_GraphDescription"]</label>
+                    <textarea class="dp-input" rows="3" @onchange="OnDescriptionChange">@graph.Description</textarea>
+                </div>
+                <div class="nfe-field">
+                    <label class="nfe-label">@Loc["DetailsPanel_GraphFlow"]</label>
+                    <select class="dp-input" value="@graph.Flow" @onchange="OnFlowChange">
+                        @foreach (var flow in Enum.GetValues<GraphFlow>())
+                        {
+                            <option value="@flow">@flow</option>
+                        }
+                    </select>
+                </div>
+                <div class="nfe-field nfe-field-check">
+                    <input type="checkbox" id="dp-instanceable" checked="@graph.Instanceable"
+                           @onchange="OnInstanceableChange" />
+                    <label class="nfe-label" for="dp-instanceable">@Loc["DetailsPanel_Instanceable"]</label>
+                </div>
+
+                @* Deklarované návratové hodnoty — zdroj pravdy. Output uzel (datový tok)
+                   i Return uzly (exec tok) si z nich staví vstupní porty. *@
+                <div class="nfe-field">
+                    <label class="nfe-label">@Loc["DetailsPanel_GraphOutputs"]</label>
+                    @for (var i = 0; i < graph.Outputs.Count; i++)
+                    {
+                        var index = i;
+                        var output = graph.Outputs[index];
+                        @* Klíč je stabilní id deklarace, ne index — jinak by Blazor při
+                           přeřazení recykloval inputy a přepsal do nich cizí hodnoty. *@
+                        <div class="dp-output-row" @key="output.Id">
+                            <input class="dp-input" value="@output.Name"
+                                   @onchange="e => OnOutputNameChange(output, e)" />
+                            <select class="dp-input" value="@output.Type"
+                                    @onchange="e => OnOutputTypeChange(output, e)">
+                                @foreach (var type in Catalog.SelectableTypes())
+                                {
+                                    <option value="@type">@TypeIds.Friendly(type)</option>
+                                }
+                            </select>
+                            <label class="dp-output-list">
+                                <input type="checkbox" checked="@output.Multiple"
+                                       @onchange="e => OnOutputMultipleChange(output, e)" />
+                                <span>@Loc["DetailsPanel_OutputList"]</span>
+                            </label>
+                            <button class="dp-output-move" disabled="@(index == 0)"
+                                    title="@Loc["DetailsPanel_MoveOutputUp"]"
+                                    @onclick="() => MoveOutput(index, -1)">▲</button>
+                            <button class="dp-output-move" disabled="@(index == graph.Outputs.Count - 1)"
+                                    title="@Loc["DetailsPanel_MoveOutputDown"]"
+                                    @onclick="() => MoveOutput(index, 1)">▼</button>
+                            <button class="dp-output-move" title="@Loc["DetailsPanel_RemoveOutput"]"
+                                    @onclick="() => RemoveOutput(output)">🗑</button>
+                        </div>
+                    }
+                    <button class="dp-output-add" @onclick="AddOutput">＋ @Loc["DetailsPanel_AddOutput"]</button>
+                </div>
+                <div class="nfe-field">
+                    <label class="nfe-label">@Loc["DetailsPanel_ExportFormat"]</label>
+                    <select class="dp-input" value="@(graph.ExportTranslator ?? Catalog.DefaultTranslator.Id)" @onchange="OnTranslatorChange">
+                        @foreach (var t in Catalog.ExportTranslators)
+                        {
+                            <option value="@t.Id">@t.DisplayName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="dp-empty">@Loc["DetailsPanel_Empty"]</div>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized() => Inspector.Changed += OnChanged;
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    private static List<NodeInput> DetailFields(DataNodeModel node) =>
+        node.InputDefs.Where(i => i.Details).ToList();
+
+    private void OnNameChange(ChangeEventArgs e)
+        => EditGraph(g => g.Name = e.Value?.ToString() ?? "");
+
+    private void OnDescriptionChange(ChangeEventArgs e)
+        => EditGraph(g => g.Description = e.Value?.ToString() ?? "");
+
+    /// <summary>
+    /// Tok se dřív nedal změnit po vytvoření, takže hotový graf nešlo převést na exec.
+    /// Mění paletu i validaci — proto host po edici revaliduje.
+    /// </summary>
+    private void OnFlowChange(ChangeEventArgs e)
+        => EditGraph(g =>
+        {
+            if (Enum.TryParse<GraphFlow>(e.Value?.ToString(), out var flow)) g.Flow = flow;
+        });
+
+    private void OnInstanceableChange(ChangeEventArgs e)
+        => EditGraph(g => g.Instanceable = e.Value is true);
+
+    private void OnOutputNameChange(GraphOutput output, ChangeEventArgs e)
+        => EditGraph(_ => output.Name = e.Value?.ToString() ?? "");
+
+    private void OnOutputTypeChange(GraphOutput output, ChangeEventArgs e)
+        => EditGraph(_ => output.Type = e.Value?.ToString() ?? TypeIds.Any);
+
+    private void OnOutputMultipleChange(GraphOutput output, ChangeEventArgs e)
+        => EditGraph(_ => output.Multiple = e.Value is true);
+
+    private void AddOutput()
+        => EditGraph(g => g.Outputs.Add(new GraphOutput { Name = UniqueOutputName(g), Type = TypeIds.Any }));
+
+    private void RemoveOutput(GraphOutput output) => EditGraph(g => g.Outputs.Remove(output));
+
+    private void MoveOutput(int index, int delta)
+    {
+        if (Inspector.Graph is not { } graph) return;
+        Inspector.Bridge?.RecordUndo();
+        var target = index + delta;
+        if (target < 0 || target >= graph.Outputs.Count) return;
+        (graph.Outputs[index], graph.Outputs[target]) = (graph.Outputs[target], graph.Outputs[index]);
+        Inspector.RaiseGraphEdited();
+    }
+
+    /// <summary>Duplicitní jméno by druhý port nezaložilo — radši rovnou nekolizní návrh.</summary>
+    private static string UniqueOutputName(GraphSettings graph)
+    {
+        var used = graph.Outputs.Select(o => o.Name).ToHashSet(StringComparer.Ordinal);
+        if (!used.Contains("Result")) return "Result";
+        for (var i = 2; ; i++)
+            if (!used.Contains($"Result{i}")) return $"Result{i}";
+    }
+
+    private void OnTranslatorChange(ChangeEventArgs e)
+        => EditGraph(g =>
+        {
+            var id = e.Value?.ToString();
+            // Normalizuj default na null, ať staré/nezměněné soubory zůstanou byte-identické.
+            g.ExportTranslator = string.IsNullOrEmpty(id) || id == Catalog.DefaultTranslator.Id ? null : id;
+        });
+
+    private void EditGraph(Action<GraphSettings> apply)
+    {
+        if (Inspector.Graph is not { } graph) return;
+        Inspector.Bridge?.RecordUndo();
+        apply(graph);
+        Inspector.RaiseGraphEdited();   // host označí dirty + překreslí název tabu
+    }
+
+    public void Dispose() => Inspector.Changed -= OnChanged;
+}

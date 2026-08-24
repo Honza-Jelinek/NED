@@ -1,0 +1,27 @@
+@namespace NED.Core
+@inject IStringLocalizer<Strings> Loc
+@* Úvodní obrazovka (žádný otevřený graf) — New / Open. Čistě prezentační. *@
+
+<div class="ne-home">
+    <div class="ne-home-header">
+        <h1 class="ne-home-title">N.E.D.</h1>
+        <p class="ne-home-subtitle">@Loc["HomeScreen_Subtitle"]</p>
+    </div>
+    <div class="ne-home-grid">
+        <div class="ne-home-card" @onclick="() => OnNew.InvokeAsync()">
+            <MudIcon Icon="@Icons.Material.Filled.Add" Class="ne-home-card-icon" />
+            <span class="ne-home-card-title">@Loc["HomeScreen_NewGraphTitle"]</span>
+            <span class="ne-home-card-desc">@Loc["HomeScreen_NewGraphDesc"]</span>
+        </div>
+        <div class="ne-home-card" @onclick="() => OnOpen.InvokeAsync()">
+            <MudIcon Icon="@Icons.Material.Filled.FolderOpen" Class="ne-home-card-icon" />
+            <span class="ne-home-card-title">@Loc["HomeScreen_OpenFileTitle"]</span>
+            <span class="ne-home-card-desc">@Loc["HomeScreen_OpenFileDesc"]</span>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnNew { get; set; }
+    [Parameter] public EventCallback OnOpen { get; set; }
+}

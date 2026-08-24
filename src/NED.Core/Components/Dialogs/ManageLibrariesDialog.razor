@@ -1,0 +1,482 @@
+@namespace NED.Core
+@* Workspace: knihovny (složky s grafy) + node packy (manifesty typů uzlů). *@
+@using MudBlazor
+@using NED.Abstractions.Manifest
+@using NED.Core.Assets
+@using NED.Core.Manifest
+@using NED.Core.NodePacks
+@implements IDisposable
+@inject AssetIndex Index
+@inject NedCatalog Catalog
+@inject NedOptions Options
+@inject IStringLocalizer<Strings> Loc
+@inject IDialogService DialogService
+@inject IEnumerable<INodePackGeneratorProvider> GeneratorProviders
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body2" Class="mb-3" Style="color:#9aa0b4;">
+            @Loc["ManageLibraries_Info1"] <code>*.nedgraph.json</code>.
+            @Loc["ManageLibraries_Info2"]
+        </MudText>
+
+        @if (Index.Roots.Count == 0)
+        {
+            <MudText Typo="Typo.body2" Style="color:#6c7080;">@Loc["ManageLibraries_NoLibrary"]</MudText>
+        }
+        else
+        {
+            <div class="ml-list">
+                @foreach (var root in Index.Roots)
+                {
+                    <div class="ml-row">
+                        <MudIcon Icon="@Icons.Material.Filled.Folder" Size="MudBlazor.Size.Small" Style="color:#c9a14a;" />
+                        <span class="ml-path" title="@root">@root</span>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="MudBlazor.Size.Small"
+                                       OnClick="@(() => Remove(root))" />
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="ml-add">
+            <MudTextField @bind-Value="_newPath" Label="@Loc["ManageLibraries_FolderPath"]"
+                          Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" />
+            @if (OnBrowse is not null)
+            {
+                <MudButton Variant="Variant.Outlined" OnClick="Browse"
+                           StartIcon="@Icons.Material.Filled.FolderOpen">@Loc["ManageLibraries_Browse"]</MudButton>
+            }
+            <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" OnClick="Add"
+                       Disabled="@string.IsNullOrWhiteSpace(_newPath)">@Loc["ManageLibraries_Add"]</MudButton>
+        </div>
+
+        <MudText Typo="Typo.caption" Class="mt-3" Style="color:#6c7080;">
+            Indexováno: @Index.Entries.Count assetů (z toho @Index.Subgraphs().Count() subgrafů).
+        </MudText>
+
+        @* ── Node packy (manifesty) ──────────────────────── *@
+        <MudDivider Class="my-4" />
+
+        <MudText Typo="Typo.subtitle2">@Loc["ManagePacks_Section"]</MudText>
+        <MudText Typo="Typo.body2" Class="mb-3" Style="color:#9aa0b4;">@Loc["ManagePacks_Info"]</MudText>
+
+        <div class="ml-list">
+            @foreach (var pack in _unmanagedPacks)
+            {
+                <div class="ml-row">
+                    <MudIcon Icon="@(pack.Id == BuiltInIds.Pack
+                                       ? Icons.Material.Filled.Home
+                                       : Icons.Material.Filled.Extension)"
+                             Size="MudBlazor.Size.Small" Style="color:var(--ned-accent);" />
+                    <span class="ml-path">@pack.Id@(pack.Version is null ? "" : $" · {pack.Version}")</span>
+                </div>
+            }
+        </div>
+
+        @if (_packs.Count == 0)
+        {
+            <MudText Typo="Typo.body2" Style="color:#6c7080;">@Loc["ManagePacks_None"]</MudText>
+        }
+        else
+        {
+            <div class="ml-list">
+                @foreach (var pack in _packs)
+                {
+                    <div class="ml-row">
+                        <MudIcon Icon="@Icons.Material.Filled.Extension" Size="MudBlazor.Size.Small"
+                                 Style="color:var(--ned-accent);" />
+                        <div class="ml-pack-copy">
+                            <span class="ml-path">@PackLabel(pack)</span>
+                            <span class="ml-pack-path" title="@pack.Path">@pack.Path</span>
+                        </div>
+                        @if (pack.Generation is not null)
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Refresh" Size="MudBlazor.Size.Small"
+                                           title="@Loc["ManagePacks_Regenerate"]"
+                                           Disabled="@(_generating || Provider(pack.Generation.Provider) is null)"
+                                           OnClick="@(() => Regenerate(pack))" />
+                        }
+                        @if (!pack.RegisteredByHost)
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="MudBlazor.Size.Small"
+                                           Disabled="@_generating" OnClick="@(() => RemovePack(pack))" />
+                        }
+                        <MudCheckBox T="bool" Class="ml-pack-toggle" Value="@pack.Enabled"
+                                     ValueChanged="@(enabled => SetPackEnabled(pack, enabled))" />
+                    </div>
+                }
+            </div>
+        }
+
+        @if (OnPickManifest is not null)
+        {
+            <div class="ml-add">
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.NoteAdd"
+                           OnClick="PickAndAddPack" Disabled="@_generating">
+                    @Loc["ManagePacks_AddFromFile"]
+                </MudButton>
+            </div>
+        }
+
+        @if (_generators.Count > 0 && OnPickPackSource is not null)
+        {
+            <div class="ml-add mt-3">
+                @if (_generators.Count > 1)
+                {
+                    <MudSelect T="string" @bind-Value="_selectedProviderId"
+                               Label="@Loc["ManagePacks_Generator"]" Dense="true" Variant="Variant.Outlined">
+                        @foreach (var generator in _generators)
+                        {
+                            <MudSelectItem T="string" Value="@generator.Descriptor.Id">
+                                @generator.Descriptor.DisplayName
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Build"
+                           OnClick="GenerateNew" Disabled="@_generating">
+                    @Loc["ManagePacks_Generate"]
+                </MudButton>
+                @if (_generating)
+                {
+                    <MudButton Variant="Variant.Text" OnClick="CancelGeneration">@Loc["Cancel"]</MudButton>
+                }
+            </div>
+        }
+
+        @if (_generationStatus is not null)
+        {
+            <MudProgressLinear Class="mt-2" Indeterminate="true" Style="@(_generating ? null : "display:none")" />
+            <MudText Typo="Typo.caption" Class="mt-2" Style="@GenerationStatusStyle">@_generationStatus</MudText>
+        }
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Rescan" StartIcon="@Icons.Material.Filled.Refresh">Přeskenovat</MudButton>
+        <MudButton Color="MudBlazor.Color.Primary" OnClick="Close">Zavřít</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
+
+    /// <summary>Volitelný host callback pro výběr složky (WPF dialog). null = jen ruční zadání cesty.</summary>
+    [Parameter] public Func<Task<string?>>? OnBrowse { get; set; }
+
+    /// <summary>Host otevře nativní dialog pro výběr hotového <c>*.nodes.json</c> manifestu.</summary>
+    [Parameter] public Func<Task<string?>>? OnPickManifest { get; set; }
+
+    /// <summary>Host vybere soubor nebo složku podle požadavků zvoleného generator provideru.</summary>
+    [Parameter] public Func<NodePackGeneratorDescriptor, Task<string?>>? OnPickPackSource { get; set; }
+
+    private string _newPath = "";
+
+    /// <summary>
+    /// Manifesty zapsané ve workspace configu. Změny seznamu upozorní ManifestStore,
+    /// který přestaví katalog a otevřené grafy za běhu.
+    /// </summary>
+    private List<PackRow> _packs = new();
+    private List<PackInfo> _unmanagedPacks = new();
+    private List<INodePackGeneratorProvider> _generators = new();
+    private string? _selectedProviderId;
+    private string? _generationStatus;
+    private bool _generationFailed;
+    private bool _generating;
+    private bool _disposed;
+    private CancellationTokenSource? _generationCancellation;
+
+    private string GenerationStatusStyle =>
+        _generationFailed ? "color:var(--ned-danger);" : "color:var(--ned-text-muted);";
+
+    protected override void OnInitialized()
+    {
+        LoadPackRows();
+        _generators = GeneratorProviders.OrderBy(provider => provider.Descriptor.DisplayName).ToList();
+        _selectedProviderId = _generators.FirstOrDefault()?.Descriptor.Id;
+    }
+
+    private async Task PickAndAddPack()
+    {
+        if (OnPickManifest is null) return;
+        var path = (await OnPickManifest())?.Trim();
+        if (string.IsNullOrWhiteSpace(path) || _packs.Any(pack => SamePath(pack.Path, path))) return;
+        var row = new PackRow
+        {
+            Path = WorkspaceConfig.PathKey(path),
+            Enabled = true,
+            Manifest = ReadManifest(path),
+        };
+        _packs.Add(row);
+        SavePack(row);
+    }
+
+    private void RemovePack(PackRow pack)
+    {
+        if (pack.RegisteredByHost) return;
+        _packs.Remove(pack);
+        var workspace = WorkspaceConfig.Load(Options.LibraryConfigPath);
+        workspace.Packs = workspace.EffectivePacks()
+            .Where(entry => !SamePath(entry.Path, pack.Path))
+            .ToList();
+        workspace.Manifests.Clear();
+        WorkspaceConfig.Save(Options.LibraryConfigPath, workspace);
+        Options.NotifyPackFilesChanged();
+    }
+
+    private void SetPackEnabled(PackRow pack, bool enabled)
+    {
+        pack.Enabled = enabled;
+        SavePack(pack);
+    }
+
+    private void SavePack(PackRow pack)
+    {
+        var workspace = WorkspaceConfig.Load(Options.LibraryConfigPath);
+        var entries = workspace.EffectivePacks().ToList();
+        var entry = entries.FirstOrDefault(candidate => SamePath(candidate.Path, pack.Path));
+        if (entry is null)
+        {
+            entry = new WorkspacePack();
+            entries.Add(entry);
+        }
+        entry.Path = pack.Path;
+        entry.Enabled = pack.Enabled;
+        entry.Generation = pack.Generation;
+        workspace.Manifests.Clear();
+        workspace.Packs = entries;
+        WorkspaceConfig.Save(Options.LibraryConfigPath, workspace);
+        Options.NotifyPackFilesChanged();
+    }
+
+    private async Task GenerateNew()
+    {
+        if (OnPickPackSource is null || Provider(_selectedProviderId) is not { } provider) return;
+        var source = await OnPickPackSource(provider.Descriptor);
+        if (string.IsNullOrWhiteSpace(source)) return;
+
+        var trusted = await DialogService.ShowMessageBoxAsync(
+            Loc["ManagePacks_TrustTitle"],
+            string.Format(Loc["ManagePacks_TrustMessage"], source),
+            yesText: Loc["ManagePacks_Generate"], cancelText: Loc["Cancel"]);
+        if (trusted != true) return;
+
+        await Generate(provider, source, null, new Dictionary<string, string>
+        {
+            ["Configuration"] = "Debug",
+        });
+    }
+
+    private async Task Regenerate(PackRow pack)
+    {
+        if (pack.Generation is not { } generation || Provider(generation.Provider) is not { } provider) return;
+        await Generate(provider, generation.Source, pack, generation.Options);
+    }
+
+    private async Task Generate(
+        INodePackGeneratorProvider provider,
+        string source,
+        PackRow? existing,
+        IReadOnlyDictionary<string, string> options)
+    {
+        if (_generating) return;
+        _generating = true;
+        _generationFailed = false;
+        _generationStatus = Loc["ManagePacks_Generating"];
+        _generationCancellation = new CancellationTokenSource();
+        var progress = new Progress<string>(message =>
+        {
+            if (_disposed) return;
+            _generationStatus = message;
+            _ = InvokeAsync(StateHasChanged);
+        });
+        StateHasChanged();
+
+        try
+        {
+            var response = await provider.GenerateAsync(new NodePackGenerationRequest
+            {
+                Source = source,
+                OutputPath = existing?.Path,
+                Options = options,
+            }, progress, _generationCancellation.Token);
+
+            if (!response.Success || string.IsNullOrWhiteSpace(response.ManifestPath))
+            {
+                GenerationFailed(response.Error ?? Loc["ManagePacks_GenerationFailed"]);
+                return;
+            }
+
+            var manifest = ManifestJson.ReadFile(response.ManifestPath);
+            if (manifest is null || string.IsNullOrWhiteSpace(manifest.Pack.Id) || manifest.Types.Count == 0)
+            {
+                GenerationFailed(Loc["ManagePacks_InvalidManifest"]);
+                return;
+            }
+
+            var target = existing ?? _packs.FirstOrDefault(pack => SamePath(pack.Path, response.ManifestPath));
+            if (target is null)
+            {
+                target = new PackRow();
+                _packs.Add(target);
+            }
+            target.Path = Path.GetFullPath(response.ManifestPath);
+            target.Enabled = true;
+            target.Manifest = manifest;
+            target.Generation = new WorkspacePackGeneration
+            {
+                Provider = provider.Descriptor.Id,
+                Source = Path.GetFullPath(source),
+                Options = new Dictionary<string, string>(options),
+            };
+            SavePack(target);
+
+            _generationStatus = string.Format(
+                Loc["ManagePacks_Generated"], manifest.Pack.Id, manifest.Types.Count);
+            _generationFailed = false;
+        }
+        catch (OperationCanceledException)
+        {
+            _generationStatus = Loc["ManagePacks_Cancelled"];
+            _generationFailed = false;
+        }
+        catch (Exception ex)
+        {
+            GenerationFailed(ex.Message);
+        }
+        finally
+        {
+            _generating = false;
+            _generationCancellation?.Dispose();
+            _generationCancellation = null;
+            if (!_disposed) StateHasChanged();
+        }
+    }
+
+    private INodePackGeneratorProvider? Provider(string? id) =>
+        _generators.FirstOrDefault(provider =>
+            string.Equals(provider.Descriptor.Id, id, StringComparison.OrdinalIgnoreCase));
+
+    private void GenerationFailed(string message)
+    {
+        _generationStatus = message;
+        _generationFailed = true;
+    }
+
+    private static bool SamePath(string left, string right)
+    {
+        try
+        {
+            return string.Equals(
+                Path.GetFullPath(left),
+                Path.GetFullPath(right),
+                StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or IOException)
+        {
+            System.Diagnostics.Debug.WriteLine($"Could not normalize node-pack path: {ex.Message}");
+            return string.Equals(left, right, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    private void CancelGeneration() => _generationCancellation?.Cancel();
+
+    private void LoadPackRows()
+    {
+        var configured = WorkspaceConfig.Load(Options.LibraryConfigPath).EffectivePacks();
+        var configuredByPath = new Dictionary<string, WorkspacePack>(StringComparer.OrdinalIgnoreCase);
+        foreach (var pack in configured)
+            configuredByPath[WorkspaceConfig.PathKey(pack.Path)] = pack;
+
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var path in Options.ManifestPaths)
+        {
+            var key = WorkspaceConfig.PathKey(path);
+            configuredByPath.TryGetValue(key, out var workspacePack);
+            if (!seen.Add(key)) continue;
+            _packs.Add(new PackRow
+            {
+                Path = key,
+                Enabled = workspacePack?.Enabled ?? true,
+                Generation = workspacePack?.Generation,
+                Manifest = ReadManifest(path),
+                RegisteredByHost = true,
+            });
+        }
+
+        foreach (var workspacePack in configured)
+        {
+            var key = WorkspaceConfig.PathKey(workspacePack.Path);
+            if (!seen.Add(key)) continue;
+            _packs.Add(new PackRow
+            {
+                Path = workspacePack.Path,
+                Enabled = workspacePack.Enabled,
+                Generation = workspacePack.Generation,
+                Manifest = ReadManifest(workspacePack.Path),
+            });
+        }
+
+        var managedIds = _packs.Select(pack => pack.Manifest?.Pack.Id)
+            .OfType<string>()
+            .ToHashSet(StringComparer.Ordinal);
+        _unmanagedPacks = Catalog.Packs
+            .Where(pack => !managedIds.Contains(pack.Id))
+            .ToList();
+    }
+
+    private static NodeManifest? ReadManifest(string path)
+    {
+        try
+        {
+            return File.Exists(path) ? ManifestJson.ReadFile(path) : null;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Could not read node-pack metadata: {ex.Message}");
+            return null;
+        }
+    }
+
+    private string PackLabel(PackRow pack)
+    {
+        if (pack.Manifest is not { } manifest) return Path.GetFileName(pack.Path);
+        var version = manifest.Pack.Version is null ? "" : $" · {manifest.Pack.Version}";
+        return $"{manifest.Pack.Id}{version} · {string.Format(Loc["ManagePacks_TypeCount"], manifest.Types.Count)}";
+    }
+
+    private void Add()
+    {
+        if (string.IsNullOrWhiteSpace(_newPath)) return;
+        Index.AddRoot(_newPath);
+        _newPath = "";
+    }
+
+    private void Remove(string root) => Index.RemoveRoot(root);
+
+    private void Rescan() => Index.Rescan();
+
+    private async Task Browse()
+    {
+        if (OnBrowse is null) return;
+        var picked = await OnBrowse();
+        if (!string.IsNullOrWhiteSpace(picked)) _newPath = picked;
+    }
+
+    private void Close() => MudDialog.Close();
+
+    public void Dispose()
+    {
+        _disposed = true;
+        _generationCancellation?.Cancel();
+    }
+
+    private sealed class PackRow
+    {
+        public string Path { get; set; } = "";
+        public bool Enabled { get; set; }
+        public bool RegisteredByHost { get; init; }
+        public WorkspacePackGeneration? Generation { get; set; }
+        public NodeManifest? Manifest { get; set; }
+    }
+}

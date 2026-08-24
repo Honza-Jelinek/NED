@@ -1,0 +1,49 @@
+@namespace NED.Core
+@* Breadcrumb cesta zanoření subgrafů (Graf › Subgraf A › Subgraf B).
+   Staví se z řetězce TabBase.OpenedFrom; segmenty kromě posledního jsou klikatelné. *@
+
+@{
+    var trail = BuildTrail();
+}
+@if (trail.Count > 1)
+{
+    <nav class="ne-breadcrumb">
+        @for (var i = 0; i < trail.Count; i++)
+        {
+            var tab = trail[i];
+            if (i > 0)
+            {
+                <span class="ne-crumb-sep">›</span>
+            }
+            if (i == trail.Count - 1)
+            {
+                <span class="ne-crumb ne-crumb-current">
+                    <span class="ne-crumb-icon">@tab.Icon</span>@tab.Title
+                </span>
+            }
+            else
+            {
+                var target = tab;
+                <button type="button" class="ne-crumb" @onclick="() => OnNavigate.InvokeAsync(target)">
+                    <span class="ne-crumb-icon">@tab.Icon</span>@tab.Title
+                </button>
+            }
+        }
+    </nav>
+}
+
+@code {
+    [Parameter] public TabBase? Active { get; set; }
+    [Parameter] public EventCallback<TabBase> OnNavigate { get; set; }
+
+    // Procházej OpenedFrom nahoru (s guardem proti cyklu A→B→A), pak otoč na pořadí root→aktivní.
+    private List<TabBase> BuildTrail()
+    {
+        var list = new List<TabBase>();
+        var seen = new HashSet<TabBase>();
+        for (var t = Active; t is not null && seen.Add(t) && list.Count < 16; t = t.OpenedFrom)
+            list.Add(t);
+        list.Reverse();
+        return list;
+    }
+}

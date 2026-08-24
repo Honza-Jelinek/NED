@@ -1,0 +1,63 @@
+﻿@namespace NED.Core
+@using NED.Abstractions.Manifest
+@inject IStringLocalizer<Strings> Loc
+@* Pop-up pro vytvoření nového grafu — druh assetu + output typ (MudBlazor). *@
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="_name" Label="Název" Variant="Variant.Outlined"
+                      Class="mb-3" Placeholder="volitelné" />
+
+        @* MudToggleGroup váže přes Value/ValueChanged, ne SelectedValue — to je jen
+           u MudSelect. Neznámý parametr spadne do UserAttributes a EventCallback
+           z něj vybuchne až za běhu, ne při buildu. *@
+        <MudToggleGroup T="GraphFlow" @bind-Value="_flow" Color="MudBlazor.Color.Primary"
+                        Class="mb-3" CheckMark="true" FixedContent="true">
+            <MudToggleItem Value="GraphFlow.Data" Text="Data flow" />
+            <MudToggleItem Value="GraphFlow.Exec" Text="Exec flow" />
+        </MudToggleGroup>
+
+        @* Založí první deklaraci „Result". Další se přidávají v Details panelu; exec graf
+           často nevrací nic, takže se tam typ nevybírá vůbec. *@
+        @if (_flow == GraphFlow.Data)
+        {
+        <MudSelect T="string" @bind-Value="_selected" Label="Output typ" Dense="true"
+                   ToStringFunc="TypeIds.Friendly" Variant="Variant.Outlined">
+            @foreach (var t in OutputTypes)
+            {
+                <MudSelectItem Value="t">@TypeIds.Friendly(t)</MudSelectItem>
+            }
+        </MudSelect>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Zrušit</MudButton>
+        <MudButton Color="MudBlazor.Color.Primary" Variant="Variant.Filled"
+                   OnClick="Create" Disabled="@(_flow == GraphFlow.Data && _selected is null)">Vytvořit</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
+
+    /// <summary>Dostupné output typy (distinct napříč katalogem).</summary>
+    [Parameter] public IReadOnlyList<string> OutputTypes { get; set; } = Array.Empty<string>();
+
+    /// <summary>Předvolený typ (např. aktuální output typ grafu).</summary>
+    [Parameter] public string? Initial { get; set; }
+
+    private string? _selected;
+    private GraphFlow _flow;
+    private string _name = "";
+
+    protected override void OnInitialized() => _selected = Initial ?? OutputTypes.FirstOrDefault();
+
+    private void Create()
+    {
+        var outType = _flow == GraphFlow.Exec ? null : _selected;
+        var name = string.IsNullOrWhiteSpace(_name) ? null : _name.Trim();
+        MudDialog.Close(DialogResult.Ok(new NewGraphResult(_flow, outType, name)));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

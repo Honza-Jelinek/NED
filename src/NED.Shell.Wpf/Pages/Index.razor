@@ -1,0 +1,221 @@
+@page "/"
+@using NED.Core
+@using System.IO
+@using System.Diagnostics
+@using NED.Core.NodePacks
+
+<div class="host-root" style="height:100vh;width:100vw;">
+    <NedCanvas @ref="_canvas"
+               OnWriteFile="WriteFile"
+               OnSaveAsRequested="SaveAsFile"
+               OnSaveAsInstanceRequested="SaveAsInstanceFile"
+               OnLoadRequested="LoadFile"
+               OnExportRequested="ExportFile"
+               OnPickFolderRequested="PickFolder"
+               OnPickNodePackManifestRequested="PickNodePackManifest"
+               OnPickNodePackSourceRequested="PickNodePackSource"
+               OnRevealInExplorer="RevealInExplorer"
+               OnOpenInEditor="OpenInVsCode"
+               OnDeleteFile="DeleteToRecycleBin"
+               OnLanguageChanged="ChangeLanguage"
+               OnSaveLayout="SaveLayout"
+               OnLoadLayout="LoadLayout" />
+</div>
+
+@code {
+    private NedCanvas _canvas = null!;
+
+    // ── Jazyk: ulož + aplikuj + reload (celý strom se překreslí v nové kultuře) ──
+
+    private void ChangeLanguage(string culture)
+    {
+        LanguageStore.Save(culture);
+        App.Restart();
+    }
+
+    // ── Layout dokovatelných panelů (golden-layout JSON) → %AppData%/NED/layout.json ──
+
+    private Task SaveLayout(string json)
+    {
+        LayoutFileStore.Save(json);
+        return Task.CompletedTask;
+    }
+
+    private Task<string?> LoadLayout()
+        => Task.FromResult(LayoutFileStore.Load());
+
+    // ── File I/O via WPF dialogs (runs on UI thread via Dispatcher) ──
+
+    private async Task WriteFile(string path, string json)
+    {
+        await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            File.WriteAllText(path, json);
+        });
+    }
+
+    private async Task<string?> SaveAsFile(string json)
+    {
+        return await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            var dlg = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "NED Graph (*.nedgraph.json)|*.nedgraph.json|All Files (*.*)|*.*",
+                DefaultExt = ".nedgraph.json",
+            };
+            if (dlg.ShowDialog() == true)
+            {
+                File.WriteAllText(dlg.FileName, json);
+                return dlg.FileName;
+            }
+            return (string?)null;
+        });
+    }
+
+    private async Task<string?> SaveAsInstanceFile(string json, string? suggestedName)
+    {
+        return await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            var dlg = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "NED Instance (*.nedinst.json)|*.nedinst.json|All Files (*.*)|*.*",
+                DefaultExt = ".nedinst.json",
+                FileName = suggestedName ?? "",
+            };
+            if (dlg.ShowDialog() == true)
+            {
+                File.WriteAllText(dlg.FileName, json);
+                return dlg.FileName;
+            }
+            return (string?)null;
+        });
+    }
+
+    private async Task<(string json, string path)?> LoadFile()
+    {
+        return await System.Windows.Application.Current.Dispatcher.InvokeAsync<(string, string)?>(() =>
+        {
+            var dlg = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "NED Files (*.nedgraph.json;*.nedinst.json)|*.nedgraph.json;*.nedinst.json|NED Graph (*.nedgraph.json)|*.nedgraph.json|NED Instance (*.nedinst.json)|*.nedinst.json|All Files (*.*)|*.*",
+            };
+            if (dlg.ShowDialog() == true)
+                return (File.ReadAllText(dlg.FileName), dlg.FileName);
+            return null;
+        });
+    }
+
+    private async Task ExportFile(string json)
+    {
+        await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            var dlg = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "Export JSON (*.json)|*.json|All Files (*.*)|*.*",
+                DefaultExt = ".json",
+            };
+            if (dlg.ShowDialog() == true)
+                File.WriteAllText(dlg.FileName, json);
+        });
+    }
+
+    private async Task<string?> PickFolder()
+    {
+        return await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            var dlg = new Microsoft.Win32.OpenFolderDialog { Title = "Vyber knihovní složku" };
+            return dlg.ShowDialog() == true ? dlg.FolderName : null;
+        });
+    }
+
+    private async Task<string?> PickNodePackManifest()
+    {
+        return await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Add node pack",
+                Filter = "NED Node Pack (*.nodes.json)|*.nodes.json|JSON Files (*.json)|*.json|All Files (*.*)|*.*",
+                DefaultExt = ".nodes.json",
+                CheckFileExists = true,
+                Multiselect = false,
+            };
+            return dialog.ShowDialog() == true ? dialog.FileName : null;
+        });
+    }
+
+    private async Task<string?> PickNodePackSource(NodePackGeneratorDescriptor generator)
+    {
+        return await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            if (generator.SourceKind == NodePackSourceKind.Directory)
+            {
+                var folder = new Microsoft.Win32.OpenFolderDialog { Title = generator.DisplayName };
+                return folder.ShowDialog() == true ? folder.FolderName : null;
+            }
+
+            var filters = generator.SourceFilters.Count > 0
+                ? generator.SourceFilters.Select(filter =>
+                {
+                    var patterns = filter.Patterns.Count == 0
+                        ? "*.*"
+                        : string.Join(';', filter.Patterns);
+                    return $"{filter.DisplayName} ({patterns})|{patterns}";
+                })
+                :
+                [
+                    $"{generator.DisplayName} ({CombinedPatterns(generator)})|{CombinedPatterns(generator)}",
+                ];
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = generator.DisplayName,
+                Filter = string.Join('|', filters.Append("All Files (*.*)|*.*")),
+            };
+            return dialog.ShowDialog() == true ? dialog.FileName : null;
+        });
+    }
+
+    private static string CombinedPatterns(NodePackGeneratorDescriptor generator) =>
+        generator.SourcePatterns.Count == 0 ? "*.*" : string.Join(';', generator.SourcePatterns);
+
+    // ── Externí akce (Process.Start) ──
+
+    private Task RevealInExplorer(string path)
+    {
+        try { Process.Start("explorer.exe", $"/select,\"{path}\""); }
+        catch (Exception ex) { Debug.WriteLine($"Explorer launch failed: {ex.Message}"); }
+        return Task.CompletedTask;
+    }
+
+    private Task OpenInVsCode(string path)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "code",
+                Arguments = $"\"{path}\"",
+                UseShellExecute = true,
+            });
+        }
+        catch (Exception ex) { Debug.WriteLine($"VS Code launch failed: {ex.Message}"); }
+        return Task.CompletedTask;
+    }
+
+    private Task<bool> DeleteToRecycleBin(string path)
+    {
+        try
+        {
+            Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(
+                path,
+                Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs,
+                Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+            return Task.FromResult(true);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Move to recycle bin failed: {ex.Message}");
+            return Task.FromResult(false);
+        }
+    }
+}

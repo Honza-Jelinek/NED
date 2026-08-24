@@ -1,0 +1,100 @@
+@namespace NED.Core
+@* Drop-in komponenta NEDa — skládá menu bar + tab bar + library panel + plátno.
+   Stav a logika jsou v code-behind NedCanvas.razor.cs. *@
+
+<MudThemeProvider Theme="_mudTheme" IsDarkMode="true" />
+
+<div class="ne-root">
+
+    <NedMenuBar Commands="_commands" Status="@StatusText" StatusTooltip="@StatusIssueTooltip" />
+
+    <NedDockHost @ref="_dockHost" Commands="_commands" OnCommandsChanged="StateHasChanged"
+                 OnEditorResized="OnEditorResized">
+        <Panels>
+            <NedPanel Id="library" Title="Library" Icon="@Icons.Material.Filled.ViewSidebar" DefaultWidth="22">
+                <LibraryPanel OnOpenAsset="OnOpenAsset"
+                              OnRevealAsset="RevealAsset" OnOpenInEditor="OpenAssetInEditor"
+                              OnRenameAsset="RenameAsset" OnDuplicateAsset="DuplicateAsset"
+                              OnDeleteAsset="DeleteAsset"
+                              OnNewInstance="OnNewInstance" OnOpenInstance="OnOpenInstance"
+                              OnDeleteInstance="OnDeleteInstance"
+                              OnManageLibraries="OnManageLibraries" />
+            </NedPanel>
+
+            <NedPanel Id="details" Title="Details" Icon="@Icons.Material.Filled.Tune" DefaultWidth="20">
+                <DetailsPanel />
+            </NedPanel>
+
+            <NedPanel Id="problems" Title="Problems" Icon="@Icons.Material.Filled.ErrorOutline" Dock="bottom" DefaultHeight="22">
+                <ProblemsPanel />
+            </NedPanel>
+        </Panels>
+
+        <Editor>
+            <div class="ne-main">
+                <NedTabBar Tabs="_tabs" Active="Active" OnSwitch="SwitchTab" OnClose="CloseTab"
+                           CanBack="_history.CanBack" CanForward="_history.CanForward"
+                           OnBack="NavigateBack" OnForward="NavigateForward" />
+
+                <NedBreadcrumb Active="Active" OnNavigate="SwitchTab" />
+
+                @if (Active is null)
+                {
+                    <NedHomeScreen OnNew="OnNew" OnOpen="OnLoad" />
+                }
+                else if (ActiveEditor is { } editorTab)
+                {
+                    <main class="ne-canvas" @oncontextmenu="OnCanvasContextMenu" @oncontextmenu:preventDefault="true"
+                          @onmousedown="OnCanvasMouseDown" @onmousemove="OnCanvasMouseMove" @onmouseup="OnCanvasMouseUp">
+                        <CascadingValue Value="_bridge" IsFixed="true">
+                            <CascadingValue Value="editorTab.Diagram" IsFixed="true" @key="Active">
+                                <DiagramCanvas @key="_canvasGen" />
+                            </CascadingValue>
+                        </CascadingValue>
+
+                        @if (_boxActive && _boxMoved)
+                        {
+                            <div class="ne-selbox"
+                                 style="left:@(BoxLeft)px; top:@(BoxTop)px; width:@(BoxWidth)px; height:@(BoxHeight)px;"></div>
+                        }
+                    </main>
+                }
+                else if (Active is InstanceTab instanceTab)
+                {
+                    <InstanceEditor Tab="instanceTab" />
+                }
+            </div>
+        </Editor>
+    </NedDockHost>
+
+    @* Node picker — pravý klik na prázdno nebo drop linku na prázdno. *@
+    @if (_pickerOpen && ActiveEditor is not null)
+    {
+        <NodePicker Xpx="_pickerX" Ypx="_pickerY"
+                    Filter="_pickerFilter" SubgraphFilter="_pickerSubFilter"
+                    ExcludeSubgraphId="ActiveEditor?.Settings.Id"
+                    PaletteVisible="ShowInPalette" ContextLabel="@_pickerContext"
+                    OnPickType="OnPickType" OnPickSubgraph="OnPickSubgraph" OnClose="ClosePicker" />
+    }
+
+    @* Node context menu — pravý klik na node. *@
+    @if (_nodeMenuOpen && _nodeMenuTarget is not null)
+    {
+        <NodeContextMenu Xpx="_nodeMenuX" Ypx="_nodeMenuY"
+                         OnDuplicate="OnMenuDuplicate" OnRefresh="OnMenuRefresh"
+                         OnDelete="OnMenuDelete" OnClose="CloseNodeMenu" />
+    }
+
+    @* Input context menu — pravý klik na přepínatelný port/pole. *@
+    @if (_inputMenuOpen)
+    {
+        <PortContextMenu Xpx="_inputMenuX" Ypx="_inputMenuY" IsPort="_inputMenuIsPort"
+                         OnToggle="ToggleInputExposure" OnClose="CloseInputMenu" />
+    }
+
+    @* Command palette — Ctrl+K. *@
+    @if (_paletteOpen)
+    {
+        <NedCommandPalette Commands="_commands" OnClose="ClosePalette" />
+    }
+</div>

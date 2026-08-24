@@ -1,0 +1,220 @@
+@namespace NED.Core
+@using NED.Abstractions.Manifest
+@* Plovoucí node picker — nahrazuje levou paletu.
+   Otevírá se na pravý klik (bez filtru) nebo po vytažení linku na prázdno
+   (s kontext filtrem podle typu portu). Šipky ↑/↓ navigují, Enter potvrdí. *@
+@inject NedCatalog Catalog
+@inject NedTheme Theme
+@inject AssetIndex AssetIndex
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+@using Microsoft.JSInterop
+
+<div class="np-backdrop" @onclick="Close" @oncontextmenu="Close" @oncontextmenu:preventDefault="true"></div>
+
+<div class="np-popup" style="left:@(Xpx)px; top:@(Ypx)px;"
+     @onclick:stopPropagation @onkeydown="OnKey">
+
+    <div class="np-search">
+        <input class="np-search-input" placeholder="Hledat node…"
+               value="@_query" @oninput="OnSearchInput" @ref="_searchRef" />
+    </div>
+
+    @if (!string.IsNullOrEmpty(ContextLabel))
+    {
+        <div class="np-context">@ContextLabel</div>
+    }
+
+    <div class="np-scroll">
+        @{
+            var total = VisibleItems().Count();
+            if (_highlight >= total) { _highlight = total - 1; }
+            if (_highlight < 0 && total > 0) { _highlight = 0; }
+            var idx = 0;
+        }
+        <MudNavMenu>
+            @if (string.IsNullOrWhiteSpace(_query))
+            {
+                @foreach (var group in Catalog.ByCategory())
+                {
+                    var items = group.Where(Allowed).ToList();
+                    if (items.Count == 0) { continue; }
+                    <MudNavGroup Title="@group.Key" Expanded="true">
+                        @foreach (var t in items) { @NodeLink(t, idx++) }
+                    </MudNavGroup>
+                }
+                var subs = VisibleSubgraphs().ToList();
+                @if (ShowSubgraphs && subs.Count > 0)
+                {
+                    <MudNavGroup Title="Subgraphs" Expanded="true">
+                        @foreach (var sg in subs) { @SubLink(sg, idx++) }
+                    </MudNavGroup>
+                }
+            }
+            else
+            {
+                @foreach (var t in FlatTypes()) { @NodeLink(t, idx++) }
+                @if (ShowSubgraphs)
+                {
+                    @foreach (var sg in VisibleSubgraphs().Where(s => Match(s.Name))) { @SubLink(sg, idx++) }
+                }
+            }
+        </MudNavMenu>
+    </div>
+</div>
+
+@code {
+    [Parameter] public double Xpx { get; set; }
+    [Parameter] public double Ypx { get; set; }
+
+    /// <summary>Filtr typů nodů (kontext z portu). null = vše.</summary>
+    [Parameter] public Func<NodeTypeDescriptor, bool>? Filter { get; set; }
+
+    /// <summary>Dodatečný filtr (např. GraphInput jen v subgraph kind).</summary>
+    [Parameter] public Func<NodeTypeDescriptor, bool>? PaletteVisible { get; set; }
+
+    /// <summary>Filtr subgrafů (kontext z portu). null = vše.</summary>
+    [Parameter] public Func<AssetEntry, bool>? SubgraphFilter { get; set; }
+
+    /// <summary>GUID právě editovaného grafu — vyloučí se (nelze do sebe vložit sám sebe).</summary>
+    [Parameter] public Guid? ExcludeSubgraphId { get; set; }
+
+    [Parameter] public bool ShowSubgraphs { get; set; } = true;
+    [Parameter] public string? ContextLabel { get; set; }
+
+    [Parameter] public EventCallback<NodeTypeDescriptor> OnPickType { get; set; }
+    [Parameter] public EventCallback<AssetEntry> OnPickSubgraph { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private string _query = "";
+    private int _highlight;
+    private ElementReference _searchRef;
+    private IJSObjectReference? _mod;
+
+    /// <summary>Položka pickeru — buď node typ, nebo subgraf.</summary>
+    private readonly record struct PickItem(NodeTypeDescriptor? NodeType, AssetEntry? Subgraph);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _mod = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/NED.Core/ned-keys.js");
+            await _mod.InvokeVoidAsync("clampPicker");
+            await _mod.InvokeVoidAsync("focusSearch");
+            StateHasChanged();
+        }
+    }
+
+    private bool Allowed(NodeTypeDescriptor t) =>
+        (PaletteVisible is null || PaletteVisible(t)) && (Filter is null || Filter(t));
+
+    private bool Match(string name) =>
+        name.Contains(_query, StringComparison.OrdinalIgnoreCase);
+
+    private IEnumerable<NodeTypeDescriptor> FlatTypes() =>
+        Catalog.AllTypes.Where(Allowed).Where(t => Match(NameOf(t)));
+
+    private IEnumerable<AssetEntry> VisibleSubgraphs() =>
+        AssetIndex.Subgraphs().Where(s => s.Id != ExcludeSubgraphId
+            && (SubgraphFilter is null || SubgraphFilter(s)));
+
+    private static string NameOf(NodeTypeDescriptor t) => t.Name;
+
+    /// <summary>Plochý seznam položek v PŘESNĚ stejném pořadí jako render (pro index navigace).</summary>
+    private IEnumerable<PickItem> VisibleItems()
+    {
+        if (string.IsNullOrWhiteSpace(_query))
+        {
+            foreach (var group in Catalog.ByCategory())
+                foreach (var t in group.Where(Allowed))
+                    yield return new PickItem(t, null);
+            if (ShowSubgraphs)
+                foreach (var sg in VisibleSubgraphs())
+                    yield return new PickItem(null, sg);
+        }
+        else
+        {
+            foreach (var t in FlatTypes())
+                yield return new PickItem(t, null);
+            if (ShowSubgraphs)
+                foreach (var sg in VisibleSubgraphs().Where(s => Match(s.Name)))
+                    yield return new PickItem(null, sg);
+        }
+    }
+
+    private RenderFragment NodeLink(NodeTypeDescriptor t, int i) => __builder =>
+    {
+        var st = Theme.Resolve(t);
+        // Pack se ukáže jen u nejednoznačných jmen — jinak by ten text byl u většiny
+        // uzlů šum, který přebije signál.
+        var pack = Catalog.AmbiguousNames.Contains(t.Name) ? Catalog.PackOf(t.Id) : null;
+        <NedTooltip Description="@t.Description" Placement="Placement.Left">
+            <MudNavLink OnClick="@(() => Pick(t))" Class="@(i == _highlight ? "np-hl" : null)">
+                <span class="np-icon" style="color:@st.Color">@st.Icon</span> @t.Name
+                @if (pack is not null)
+                {
+                    <span class="np-pack">@pack</span>
+                }
+            </MudNavLink>
+        </NedTooltip>
+    };
+
+    private RenderFragment SubLink(AssetEntry sg, int i) => __builder =>
+    {
+        <MudNavLink OnClick="@(() => PickSub(sg))" Class="@(i == _highlight ? "np-hl" : null)">
+            <span class="np-icon" style="color:#6a5acd">⧉</span> @sg.Name
+        </MudNavLink>
+    };
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        _query = e.Value?.ToString() ?? "";
+        _highlight = 0;
+    }
+
+    private async Task OnKey(KeyboardEventArgs e)
+    {
+        var count = VisibleItems().Count();
+        switch (e.Key)
+        {
+            case "Escape":
+                await Close();
+                break;
+            case "ArrowDown":
+                if (count > 0) { _highlight = (_highlight + 1) % count; await ScrollToHighlight(); }
+                break;
+            case "ArrowUp":
+                if (count > 0) { _highlight = (_highlight - 1 + count) % count; await ScrollToHighlight(); }
+                break;
+            case "Enter":
+                await PickHighlighted();
+                break;
+        }
+    }
+
+    private async Task ScrollToHighlight()
+    {
+        StateHasChanged();
+        await Task.Yield();
+        if (_mod is not null) await _mod.InvokeVoidAsync("scrollHighlight");
+    }
+
+    private async Task PickHighlighted()
+    {
+        var items = VisibleItems().ToList();
+        if (_highlight < 0 || _highlight >= items.Count) return;
+        var item = items[_highlight];
+        if (item.Subgraph is not null) await PickSub(item.Subgraph);
+        else if (item.NodeType is not null) await Pick(item.NodeType);
+    }
+
+    private async Task Pick(NodeTypeDescriptor t) => await OnPickType.InvokeAsync(t);
+    private async Task PickSub(AssetEntry sg) => await OnPickSubgraph.InvokeAsync(sg);
+    private async Task Close() => await OnClose.InvokeAsync();
+
+    public async ValueTask DisposeAsync()
+    {
+        try { if (_mod is not null) await _mod.DisposeAsync(); }
+        catch { /* circuit může být zavřený */ }
+    }
+}

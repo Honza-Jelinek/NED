@@ -1,0 +1,32 @@
+@namespace NED.Core
+
+@if (string.IsNullOrEmpty(TypeLine) && string.IsNullOrEmpty(Description))
+{
+    @ChildContent
+}
+else
+{
+    <MudTooltip Arrow="true" Placement="@Placement" Duration="200" Inline="false"
+                RootClass="ned-tooltip-root" Class="ned-tooltip" Color="MudBlazor.Color.Transparent">
+        <TooltipContent>
+            @if (!string.IsNullOrEmpty(TypeLine))
+            {
+                <div class="ned-tip-type">@TypeLine</div>
+            }
+            @if (!string.IsNullOrEmpty(Description))
+            {
+                <div class="ned-tip-desc">@Description</div>
+            }
+        </TooltipContent>
+        <ChildContent>
+            @ChildContent
+        </ChildContent>
+    </MudTooltip>
+}
+
+@code {
+    [Parameter] public string? TypeLine { get; set; }
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public Placement Placement { get; set; } = Placement.Top;
+}

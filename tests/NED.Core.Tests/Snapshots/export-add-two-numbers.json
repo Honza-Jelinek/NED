@@ -1,0 +1,31 @@
+{
+  "exportVersion": 1,
+  "packs": [
+    {
+      "id": "sandbox",
+      "version": "1.0.0"
+    }
+  ],
+  "settings": {},
+  "outputs": [
+    {
+      "name": "Result",
+      "type": "double",
+      "multiple": false,
+      "value": {
+        "$id": "n1",
+        "$type": "sandbox/Add",
+        "A": {
+          "$id": "n2",
+          "$type": "sandbox/NumberConstant",
+          "Value": 2
+        },
+        "B": {
+          "$id": "n3",
+          "$type": "sandbox/NumberConstant",
+          "Value": 3
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+@namespace NED.Core
+@inject IStringLocalizer<Strings> Loc
+@* Lišta záložek otevřených grafů. Čistě prezentační. *@
+
+<div class="ne-tabbar">
+    <button type="button" class="ne-nav-btn" disabled="@(!CanBack)"
+            title="@Loc["Navigate_Back"]" @onclick="() => OnBack.InvokeAsync()">‹</button>
+    <button type="button" class="ne-nav-btn" disabled="@(!CanForward)"
+            title="@Loc["Navigate_Forward"]" @onclick="() => OnForward.InvokeAsync()">›</button>
+    @foreach (var tab in Tabs)
+    {
+        var cls = "ne-tab" + (tab == Active ? " ne-tab-active" : "");
+        <div class="@cls" @onclick="() => OnSwitch.InvokeAsync(tab)">
+            <span class="ne-tab-kind">@tab.Icon</span>
+            <span class="ne-tab-title">@tab.Title@(tab.IsDirty ? " •" : "")</span>
+            <span class="ne-tab-close" @onclick="() => OnClose.InvokeAsync(tab)" @onclick:stopPropagation>×</span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public IReadOnlyList<TabBase> Tabs { get; set; } = Array.Empty<TabBase>();
+    [Parameter] public TabBase? Active { get; set; }
+    [Parameter] public EventCallback<TabBase> OnSwitch { get; set; }
+    [Parameter] public EventCallback<TabBase> OnClose { get; set; }
+    [Parameter] public bool CanBack { get; set; }
+    [Parameter] public bool CanForward { get; set; }
+    [Parameter] public EventCallback OnBack { get; set; }
+    [Parameter] public EventCallback OnForward { get; set; }
+}

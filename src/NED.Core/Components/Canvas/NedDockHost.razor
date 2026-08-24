@@ -1,0 +1,27 @@
+@namespace NED.Core
+@* Hostí dokovatelné panely přes golden-layout (VirtualLayout model).
+   golden-layout vlastní jen prázdný .ne-gl-root (splittery, hlavičky, drop-zóny);
+   skutečný obsah renderuje Blazor do .ne-portal-layer a ned-dock.js ho jen polohuje.
+   Panely se registrují deklarativně přes <NedPanel> (viz Panels slot níže).
+   Logika v code-behind NedDockHost.razor.cs. *@
+
+<div class="ne-dock-host" @ref="_host">
+    <div class="ne-gl-root"></div>
+
+    <div class="ne-portal-layer">
+        @* Pevný editor — zamčený střed, nedokovatelný. *@
+        <div class="ne-portal" data-portal="editor">@Editor</div>
+
+        @* Dokovatelné panely — jeden portál na registrovaný <NedPanel>. *@
+        @foreach (var p in _panels)
+        {
+            <div class="ne-portal" data-portal="@p.Id" @key="p.Id">@p.ChildContent</div>
+        }
+    </div>
+
+    @* Registrační „sink": <NedPanel> děti se přes cascading referenci zaregistrují,
+       samy nic nevykreslí. *@
+    <CascadingValue Value="this" IsFixed="true">
+        @Panels
+    </CascadingValue>
+</div>

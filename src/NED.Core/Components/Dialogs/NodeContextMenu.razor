@@ -1,0 +1,32 @@
+@namespace NED.Core
+@inject IStringLocalizer<Strings> Loc
+@* Kontext menu nodu (pravý klik na node) — Duplikovat / Refresh / Smazat. *@
+
+<div class="np-backdrop" @onclick="Close" @oncontextmenu="Close" @oncontextmenu:preventDefault="true"></div>
+
+<div class="nc-menu" style="left:@(Xpx)px; top:@(Ypx)px;" @onclick:stopPropagation
+     @oncontextmenu:preventDefault="true">
+    <div class="nc-item" @onclick="() => Pick(OnDuplicate)">
+        <span class="nc-ic">⧉</span> @Loc["NodeContextMenu_Duplicate"]
+    </div>
+    <div class="nc-item" @onclick="() => Pick(OnRefresh)">
+        <span class="nc-ic">↻</span> @Loc["NodeContextMenu_Refresh"]
+    </div>
+    <div class="nc-sep"></div>
+    <div class="nc-item nc-danger" @onclick="() => Pick(OnDelete)">
+        <span class="nc-ic">🗑</span> @Loc["NodeContextMenu_Delete"]
+    </div>
+</div>
+
+@code {
+    [Parameter] public double Xpx { get; set; }
+    [Parameter] public double Ypx { get; set; }
+
+    [Parameter] public EventCallback OnDuplicate { get; set; }
+    [Parameter] public EventCallback OnRefresh { get; set; }
+    [Parameter] public EventCallback OnDelete { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private async Task Pick(EventCallback cb) => await cb.InvokeAsync();
+    private async Task Close() => await OnClose.InvokeAsync();
+}

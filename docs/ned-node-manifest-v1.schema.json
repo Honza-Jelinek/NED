@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ned:schema:node-manifest:v1",
+  "title": "NED node pack manifest v1",
+  "type": "object",
+  "required": ["ManifestVersion", "Pack", "Types"],
+  "properties": {
+    "ManifestVersion": { "const": 1 },
+    "Pack": { "$ref": "#/$defs/pack" },
+    "Enums": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/enum" },
+      "default": []
+    },
+    "Types": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/nodeType" }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "typeId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nodeId": {
+      "type": "string",
+      "pattern": "^[^/]+/.+$"
+    },
+    "pack": {
+      "type": "object",
+      "required": ["Id"],
+      "properties": {
+        "Id": { "type": "string", "minLength": 1, "pattern": "^[^/]+$" },
+        "Name": { "type": ["string", "null"] },
+        "Version": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "enum": {
+      "type": "object",
+      "required": ["Id", "Values"],
+      "properties": {
+        "Id": { "$ref": "#/$defs/nodeId" },
+        "Values": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "nodeOutput": {
+      "type": "object",
+      "required": ["Name"],
+      "properties": {
+        "Name": { "type": "string", "minLength": 1 },
+        "Type": { "type": ["string", "null"] },
+        "Description": { "type": ["string", "null"] },
+        "Multiple": { "type": "boolean", "default": false }
+      },
+      "additionalProperties": true
+    },
+    "nodeInput": {
+      "type": "object",
+      "required": ["Name", "Label", "Kind", "Type"],
+      "properties": {
+        "Name": { "type": "string", "minLength": 1 },
+        "Label": { "type": "string" },
+        "Kind": { "enum": ["Field", "Port"] },
+        "Type": { "$ref": "#/$defs/typeId" },
+        "Default": true,
+        "HasExplicitDefault": { "type": "boolean", "default": false },
+        "Description": { "type": ["string", "null"] },
+        "Multiple": { "type": "boolean", "default": false },
+        "Optional": { "type": "boolean", "default": false },
+        "Details": { "type": "boolean", "default": false },
+        "TypePicker": { "type": "boolean", "default": false }
+      },
+      "additionalProperties": true
+    },
+    "nodeType": {
+      "type": "object",
+      "required": ["Id", "Name", "Outputs", "Inputs"],
+      "properties": {
+        "Id": { "$ref": "#/$defs/nodeId" },
+        "Name": { "type": "string", "minLength": 1 },
+        "Category": { "type": "string", "default": "General" },
+        "Color": { "type": ["string", "null"] },
+        "Icon": { "type": ["string", "null"] },
+        "Description": { "type": ["string", "null"] },
+        "Extends": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/typeId" },
+          "default": []
+        },
+        "Outputs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nodeOutput" },
+          "default": []
+        },
+        "Inputs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nodeInput" },
+          "default": []
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

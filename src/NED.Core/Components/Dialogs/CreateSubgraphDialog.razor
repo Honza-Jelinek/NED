@@ -1,0 +1,56 @@
+@namespace NED.Core
+@inject IStringLocalizer<Strings> Loc
+@* Proklik z Problems panelu (stale subgraph reference) — vytvoří chybějící subgraf soubor
+   s interface odpovídajícím tomu, co SubgraphNode na plátně už očekává. *@
+
+<MudDialog>
+    <DialogContent>
+        @if (Roots.Count == 0)
+        {
+            <div class="pp-empty">@Loc["Dialog_CreateSubgraph_NoRoots"]</div>
+        }
+        else
+        {
+            <MudTextField @bind-Value="_name" Label="@Loc["Dialog_CreateSubgraph_Name"].Value"
+                          Variant="Variant.Outlined" Class="mb-3" Immediate="true" AutoFocus="true" />
+
+            <MudSelect T="string" @bind-Value="_dir" Label="@Loc["Dialog_CreateSubgraph_Location"].Value"
+                       Dense="true" Variant="Variant.Outlined">
+                @foreach (var root in Roots)
+                {
+                    <MudSelectItem Value="root">@root</MudSelectItem>
+                }
+            </MudSelect>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">@Loc["Cancel"]</MudButton>
+        <MudButton Color="MudBlazor.Color.Primary" Variant="Variant.Filled"
+                   Disabled="Roots.Count == 0 || string.IsNullOrWhiteSpace(_name) || _dir is null"
+                   OnClick="Create">@Loc["Dialog_Create"]</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter] public string SubgraphName { get; set; } = "";
+    [Parameter] public IReadOnlyList<string> Roots { get; set; } = Array.Empty<string>();
+
+    private string _name = "";
+    private string? _dir;
+
+    protected override void OnInitialized()
+    {
+        _name = SubgraphName;
+        _dir = Roots.FirstOrDefault();
+    }
+
+    private void Create()
+    {
+        if (string.IsNullOrWhiteSpace(_name) || _dir is null) return;
+        MudDialog.Close(DialogResult.Ok((_dir, _name.Trim())));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

@@ -1,0 +1,1438 @@
+/* Generický chrome NEDa. Doménově slepé — žádné perk/equipment styly.
+   Ty patří do hostitele (NED.Shell.Wpf). Servíruje se jako _content/NED.Core/ned.css */
+
+:root {
+    --ned-bg: #0f111b;
+    --ned-surface: #131d30;
+    --ned-surface-muted: #18243a;
+    --ned-surface-hover: #1d2c44;
+    --ned-border: #294157;
+    --ned-primary: #377799;
+    --ned-accent: #34c5bd;
+    --ned-success: #2dcc3e;
+    --ned-danger: #cc252b;
+    --ned-warning: #eba612;
+    --ned-info: #3758cc;
+    --ned-text: #e7edf2;
+    --ned-text-muted: #95a7b5;
+    --ned-text-subtle: #687b89;
+
+    /* Tvar exec pinu — štítek. Maska, ne clip-path: clip-path umí jen plnou siluetu,
+       kdežto maska nese i dutou variantu, takže nepřipojený pin má obrys a napojený
+       výplň. Barvu pořád dává background, takže --pc funguje jako u ostatních portů. */
+    --ned-exec-outline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 20'%3E%3Cpath d='M2.5 2.5h12.6l6.4 7.5-6.4 7.5H2.5z' fill='none' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E");
+    --ned-exec-filled: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 20'%3E%3Cpath d='M2.5 2.5h12.6l6.4 7.5-6.4 7.5H2.5z' fill='%23000' stroke='%23000' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.ne-root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background: var(--ned-bg);
+    color: var(--ned-text);
+    font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+/* ── Dokovací host (golden-layout) ─────────────────────
+   .ne-gl-root vlastní golden-layout (splittery, hlavičky, drop-zóny).
+   .ne-portal-layer je průhledná overlay vrstva nad ním — Blazor sem renderuje
+   obsah panelů a ned-dock.js každý .ne-portal absolutně polohuje podle rectu z GL.
+   Portály leží NAD GL rootem, ale jen přes plochu obsahu (ne přes hlavičky/splittery),
+   takže drag/drop GL zůstává funkční. */
+.ne-dock-host {
+    position: relative;
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+
+.ne-gl-root {
+    position: absolute;
+    inset: 0;
+}
+
+.ne-portal-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;   /* klikání projde na GL hlavičky/splittery mimo portály */
+}
+
+.ne-portal {
+    position: absolute;
+    overflow: hidden;
+    pointer-events: auto;
+    display: none;          /* dokud ho ned-dock.js nenapolohuje */
+}
+
+.ne-portal > * {
+    width: 100%;
+    height: 100%;
+}
+
+.ne-main {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ── Menu bar (MudBlazor) ─────────────────────────────── */
+.ne-menubar {
+    flex: 0 0 auto;
+    border-bottom: 1px solid var(--ned-border);
+    border-top: 2px solid var(--ned-border);
+}
+
+.ne-root .mud-toolbar.mud-toolbar-dense.mud-toolbar-appbar {
+    background: var(--ned-surface) !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 6px 8px 2px 0px !important;
+}
+
+.ne-root .mud-toolbar-appbar .mud-button.mud-button-text.mud-button-text-size-medium {
+    padding: 2px 8px !important;
+    min-height: 0 !important;
+    height: auto !important;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.ne-status-text {
+    color: var(--ned-text-subtle);
+    font-size: 11px;
+    padding-right: 8px;
+}
+
+.ne-lang {
+    display: inline-flex;
+    align-items: center;
+}
+
+.ne-lang-flag {
+    width: 20px;
+    height: 14px;
+    object-fit: cover;
+    border-radius: 2px;
+    margin-right: 8px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+/* ── Tab bar ─────────────────────────────────────────── */
+.ne-tabbar {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 1px;
+    background: var(--ned-bg);
+    border-bottom: 1px solid var(--ned-border);
+    overflow-x: auto;
+    padding: 0 4px;
+}
+
+.ne-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: #8a8f9e;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 2px solid transparent;
+    transition: color .12s, border-color .12s;
+    white-space: nowrap;
+}
+
+.ne-tab:hover { color: #c0c4d0; }
+
+.ne-tab-active {
+    color: var(--ned-text);
+    border-bottom-color: var(--ned-accent);
+    background: color-mix(in srgb, var(--ned-accent) 8%, transparent);
+}
+
+.ne-tab-kind { font-size: 10px; opacity: .7; }
+
+.ne-tab-close {
+    font-size: 14px;
+    line-height: 1;
+    opacity: .4;
+    padding: 0 2px;
+    cursor: pointer;
+}
+
+.ne-tab-close:hover { opacity: 1; color: #f44; }
+
+/* ── Back/forward navigace v tab baru ─────────────────── */
+.ne-nav-btn {
+    flex: 0 0 auto;
+    align-self: center;
+    background: transparent;
+    border: none;
+    color: #8a8f9e;
+    font-size: 16px;
+    line-height: 1;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color .12s, background .12s;
+}
+
+.ne-nav-btn:hover:not(:disabled) { color: var(--ned-text); background: color-mix(in srgb, var(--ned-primary) 12%, transparent); }
+.ne-nav-btn:disabled { opacity: .3; cursor: default; }
+
+/* ── Breadcrumb (cesta zanoření subgrafů) ─────────────── */
+.ne-breadcrumb {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px 10px;
+    font-size: 11px;
+    background: var(--ned-bg);
+    border-bottom: 1px solid var(--ned-border);
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.ne-crumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    color: #8a8f9e;
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color .12s, background .12s;
+}
+
+button.ne-crumb:hover { color: var(--ned-text); background: color-mix(in srgb, var(--ned-primary) 12%, transparent); }
+
+.ne-crumb-current { color: #e0e2ea; cursor: default; }
+.ne-crumb-icon { font-size: 10px; opacity: .7; }
+.ne-crumb-sep { color: #4c5061; padding: 0 1px; }
+
+/* ── Command palette (Ctrl+K) ─────────────────────────── */
+.ne-palette-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    padding-top: 80px;
+    background: rgba(0,0,0,.35);
+}
+
+.ne-palette-popup {
+    width: 100%;
+    max-width: 480px;
+    max-height: 60vh;
+    background: var(--ned-surface);
+    border: 1px solid var(--ned-border);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    align-self: flex-start;
+}
+
+.ne-palette-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 11px;
+    color: #8a8f9e;
+    cursor: pointer;
+    border-bottom: 1px solid #232633;
+    transition: color .12s;
+}
+
+.ne-palette-back:hover { color: #e0e2ea; }
+.ne-palette-back-arrow { font-size: 14px; }
+
+.ne-palette-search {
+    width: 100%;
+    padding: 10px 14px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #232633;
+    color: #e0e2ea;
+    font-size: 14px;
+    outline: none;
+}
+
+.ne-palette-search::placeholder { color: #4c5061; }
+
+.ne-palette-list {
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.ne-palette-cat {
+    padding: 6px 14px 2px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ned-accent);
+    user-select: none;
+}
+
+.ne-palette-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 14px;
+    font-size: 13px;
+    color: #c0c4d0;
+    cursor: pointer;
+    transition: background .08s;
+}
+
+.ne-palette-item:hover { background: color-mix(in srgb, var(--ned-primary) 12%, transparent); }
+.ne-palette-hl { background: color-mix(in srgb, var(--ned-primary) 22%, transparent) !important; color: var(--ned-text); }
+.ne-palette-item-disabled { opacity: .35; cursor: default; }
+.ne-palette-item-disabled:hover { background: transparent; }
+
+.ne-palette-icon { flex: 0 0 auto; opacity: .7; }
+.ne-palette-label { flex: 1 1 auto; }
+
+.ne-palette-shortcut {
+    flex: 0 0 auto;
+    font-size: 10px;
+    color: var(--ned-accent);
+    background: color-mix(in srgb, var(--ned-accent) 12%, transparent);
+    padding: 1px 6px;
+    border-radius: 3px;
+}
+
+.ne-palette-cat-badge {
+    flex: 0 0 auto;
+    font-size: 10px;
+    color: #4c5061;
+}
+
+.ne-palette-submenu-arrow {
+    flex: 0 0 auto;
+    font-size: 14px;
+    color: var(--ned-accent);
+}
+
+.ne-palette-empty {
+    padding: 12px 14px;
+    text-align: center;
+    color: #4c5061;
+    font-size: 12px;
+}
+
+/* ── Paleta ───────────────────────────────────────────── */
+.ne-palette {
+    width: 210px;
+    flex: 0 0 210px;
+    background: var(--ned-surface);
+    border-right: 1px solid var(--ned-border);
+    padding: 12px;
+    overflow-y: auto;
+}
+
+.ne-pal-heading {
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #6c7080;
+    margin: 14px 0 6px;
+}
+
+.ne-pal-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    background: var(--ned-surface-muted);
+    border: 1px solid var(--ned-border);
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: background .12s, border-color .12s;
+}
+
+.ne-pal-card:hover {
+    background: var(--ned-surface-hover);
+    border-color: var(--ned-primary);
+}
+
+.ne-pal-icon { font-size: 16px; }
+.ne-pal-name { font-size: 13px; }
+
+.ne-pal-empty { font-size: 12px; color: #565b6e; padding: 2px 10px 6px; font-style: italic; }
+
+/* ── Node picker (pravý klik / drop linku) ────────────── */
+.np-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1400;
+}
+
+.np-popup {
+    position: fixed;
+    z-index: 1401;
+    width: 244px;
+    max-height: 62vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--ned-surface);
+    border: 1px solid var(--ned-border);
+    border-radius: 8px;
+    box-shadow: 0 12px 44px rgba(0,0,0,.65);
+    overflow: hidden;
+}
+
+.np-search { padding: 8px; border-bottom: 1px solid #232633; }
+
+.np-search-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: #0e1018;
+    border: 1px solid #282c3f;
+    border-radius: 6px;
+    color: #e0e2ea;
+    padding: 6px 9px;
+    font-size: 12.5px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color .15s;
+}
+
+.np-search-input:focus { border-color: var(--ned-primary); }
+
+.np-context {
+    padding: 5px 12px;
+    font-size: 11px;
+    color: var(--ned-accent);
+    background: color-mix(in srgb, var(--ned-accent) 8%, transparent);
+    border-bottom: 1px solid var(--ned-border);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.np-scroll { overflow-y: auto; padding: 4px 0; }
+
+.np-icon { font-weight: 800; margin-right: 6px; display: inline-block; min-width: 14px; }
+/* Pack u položky pickeru — jen když je jméno uzlu nejednoznačné (viz NedCatalog.AmbiguousNames) */
+.np-pack { margin-left: 6px; font-size: 11px; opacity: .55; }
+
+/* Kompaktnější MudNavMenu uvnitř pickeru */
+.np-popup .mud-nav-link { padding: 4px 14px; min-height: 30px; font-size: 12.5px; }
+.np-popup .mud-nav-group .mud-nav-link.mud-nav-link { padding-left: 22px; }
+.np-popup .mud-navmenu { padding: 0; }
+
+/* Zvýraznění položky vybrané šipkami.
+   MudNavLink dává Class na vnější .mud-nav-item, link je uvnitř. */
+.np-popup .mud-nav-item.np-hl .mud-nav-link {
+    background: color-mix(in srgb, var(--ned-primary) 22%, transparent) !important;
+    box-shadow: inset 2px 0 0 var(--ned-accent);
+}
+
+/* ── Node context menu (pravý klik na node) ───────────── */
+.nc-menu {
+    position: fixed;
+    z-index: 1401;
+    min-width: 156px;
+    background: var(--ned-surface);
+    border: 1px solid var(--ned-border);
+    border-radius: 8px;
+    box-shadow: 0 12px 44px rgba(0,0,0,.65);
+    padding: 4px;
+    overflow: hidden;
+}
+
+.nc-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 12px;
+    border-radius: 5px;
+    font-size: 12.5px;
+    color: #d8dae4;
+    cursor: pointer;
+    user-select: none;
+    transition: background .12s;
+}
+
+.nc-item:hover { background: color-mix(in srgb, var(--ned-primary) 18%, transparent); }
+
+.nc-ic { font-size: 13px; width: 16px; text-align: center; opacity: .85; }
+
+.nc-sep { height: 1px; background: var(--ned-border); margin: 4px 6px; }
+
+.nc-danger { color: var(--ned-danger); }
+.nc-danger:hover { background: color-mix(in srgb, var(--ned-danger) 14%, transparent); }
+
+/* ── Manage Libraries dialog ──────────────────────────── */
+.ml-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+.ml-row { display: flex; align-items: center; gap: 8px; }
+.ml-path {
+    flex: 1; font-size: 12.5px; color: #c7cad6;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ml-pack-copy { display: flex; flex: 1; min-width: 0; flex-direction: column; }
+.ml-pack-path {
+    color: var(--ned-text-muted); font-size: 10.5px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ml-pack-toggle { margin-left: auto; }
+.ml-add { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.ml-add .mud-input-control { flex: 1; }
+
+/* ── Details panel (nastavení vybraného nodu / grafu) ──── */
+.dp-panel {
+    width: 100%;
+    height: 100%;
+    background: var(--ned-surface);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    color: #d8d9e0;
+}
+
+.dp-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--ned-border);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #e0e2ea;
+}
+
+.dp-header .dp-icon { opacity: .8; }
+
+.dp-section-title {
+    padding: 10px 12px 2px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--ned-accent);
+}
+
+.dp-empty {
+    padding: 16px 12px;
+    color: #6c7080;
+    font-size: 12px;
+}
+
+.dp-body { padding: 6px 12px 12px; }
+
+/* Stacked field list (label nad inputem, plná šířka) — pro Details panel. */
+.nfe-list { display: flex; flex-direction: column; gap: 10px; }
+
+.nfe-field { display: flex; flex-direction: column; gap: 4px; }
+.nfe-field-check { flex-direction: row; align-items: center; gap: 8px; }
+
+.nfe-label { color: #8a8f9e; font-size: 11px; font-weight: 500; }
+.nfe-desc { color: #6c7080; font-size: 10.5px; line-height: 1.35; }
+
+.nfe-field .dn-input { width: 100%; }
+
+.dp-input {
+    width: 100%;
+    background: var(--ned-bg);
+    border: 1px solid var(--ned-border);
+    border-radius: 6px;
+    color: #e0e2ea;
+    padding: 5px 8px;
+    font-size: 11.5px;
+    font-family: inherit;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+.dp-input:focus { outline: none; border-color: var(--ned-primary); background: var(--ned-surface-muted); }
+textarea.dp-input { resize: vertical; min-height: 56px; }
+
+/* Řádek deklarace výstupu: jméno roste, typ drží šířku, šipky jsou jen ikony. */
+.dp-output-row { display: flex; align-items: center; gap: 4px; }
+.dp-output-row .dp-input:first-child { flex: 1 1 auto; min-width: 0; }
+.dp-output-row select.dp-input { flex: 0 1 96px; }
+.dp-output-list { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; white-space: nowrap; }
+.dp-output-list input { margin: 0; }
+.dp-output-move {
+    flex: 0 0 auto;
+    background: none;
+    border: 1px solid var(--ned-border);
+    border-radius: 6px;
+    color: #e0e2ea;
+    cursor: pointer;
+    padding: 4px 6px;
+    font-size: 10px;
+    line-height: 1;
+}
+.dp-output-move:hover:not(:disabled) { border-color: var(--ned-primary); }
+.dp-output-move:disabled { opacity: 0.35; cursor: default; }
+.dp-output-list { display: flex; align-items: center; gap: 4px; font-size: 10.5px; white-space: nowrap; }
+.dp-output-add {
+    align-self: flex-start;
+    margin-top: 2px;
+    background: none;
+    border: 1px dashed var(--ned-border);
+    border-radius: 6px;
+    color: #e0e2ea;
+    cursor: pointer;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-family: inherit;
+}
+.dp-output-add:hover { border-color: var(--ned-primary); border-style: solid; }
+
+/* ── Problems panel (validace + operační chyby, proklik na node) ──────── */
+.pp-panel {
+    width: 100%;
+    height: 100%;
+    background: var(--ned-surface);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    color: #d8d9e0;
+}
+
+.pp-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--ned-border);
+    font-size: 12px;
+}
+
+.pp-spacer { flex: 1; }
+
+.pp-count { font-size: 11.5px; font-weight: 600; }
+.pp-count-error { color: var(--ned-danger); }
+.pp-count-warning { color: var(--ned-warning); }
+
+.pp-clear {
+    background: none;
+    border: 1px solid var(--ned-border);
+    border-radius: 6px;
+    color: #8a8f9e;
+    padding: 3px 10px;
+    font-size: 11px;
+    cursor: pointer;
+}
+.pp-clear:hover:not(:disabled) { border-color: var(--ned-accent); color: var(--ned-text); }
+.pp-clear:disabled { opacity: .4; cursor: default; }
+
+.pp-empty {
+    padding: 16px 12px;
+    color: #6c7080;
+    font-size: 12px;
+}
+
+.pp-list { display: flex; flex-direction: column; }
+
+.pp-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    font-size: 11.5px;
+    border-bottom: 1px solid #1c1e2a;
+    cursor: pointer;
+}
+.pp-row:hover { background: #1b1e2e; }
+
+.pp-icon { flex-shrink: 0; }
+.pp-message { flex: 1; color: #d8d9e0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-source { color: #6c7080; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; flex-shrink: 0; }
+
+.pp-action, .pp-remove {
+    background: none;
+    border: 1px solid #282c3f;
+    border-radius: 6px;
+    color: #8a8f9e;
+    padding: 2px 8px;
+    font-size: 10.5px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.pp-action:hover { border-color: var(--ned-accent); color: var(--ned-text); }
+.pp-remove:hover { border-color: var(--ned-danger); color: var(--ned-danger); }
+
+/* ── Library panel (vyplňuje svůj dokovací panel) ──────── */
+.lp-panel {
+    width: 100%;
+    height: 100%;
+    background: var(--ned-surface);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.lp-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #6c7080;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid #232633;
+    flex: 0 0 auto;
+}
+
+.lp-header:hover { color: #a0a5b5; }
+
+.lp-toggle { font-size: 10px; }
+
+.lp-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.lp-panel .mud-navmenu { padding: 0; }
+
+/* Group header button (folder icon + "NEDlib" + expand arrow) */
+.lp-panel .mud-nav-group > .mud-nav-link {
+    padding: 4px 8px;
+    min-height: 30px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.lp-panel .mud-nav-group > .mud-nav-link .mud-nav-link-icon { flex: 0 0 auto; font-size: 16px; }
+.lp-panel .mud-nav-group > .mud-nav-link .mud-nav-link-text { flex: 1 1 auto; line-height: 1; }
+.lp-panel .mud-nav-group > .mud-nav-link .mud-nav-link-expand-icon { flex: 0 0 auto; }
+
+/* Child items inside group */
+.lp-panel .mud-nav-group .mud-collapse-wrapper { background: transparent; }
+.lp-panel .mud-nav-group .mud-collapse-wrapper .mud-nav-link {
+    padding: 3px 10px 3px 32px;
+    min-height: 26px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.lp-kind { font-size: 10px; margin-right: 5px; opacity: .7; }
+
+.lp-empty {
+    font-size: 12px;
+    color: #565b6e;
+    padding: 12px;
+    font-style: italic;
+    text-align: center;
+}
+
+.lp-empty-item { font-size: 11px; color: #565b6e; font-style: italic; }
+
+.lp-footer {
+    flex: 0 0 auto;
+    padding: 6px 8px;
+    border-top: 1px solid #232633;
+}
+
+.lp-manage-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px;
+    font-size: 11px;
+    color: #9aa0b4;
+    background: transparent;
+    border: 1px solid #2a2d3a;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.lp-manage-btn:hover {
+    background: #1e2130;
+    color: #c8cdd8;
+}
+
+/* ── Plátno ───────────────────────────────────────────── */
+.ne-canvas {
+    flex: 1 1 auto;
+    position: relative;
+    overflow: hidden;
+    background: var(--ned-bg);
+}
+
+/* Box selection rubber-band (Shift+drag). */
+.ne-selbox {
+    position: fixed;
+    z-index: 1390;
+    border: 1px solid var(--ned-accent);
+    background: color-mix(in srgb, var(--ned-accent) 12%, transparent);
+    pointer-events: none;
+}
+
+/* ── Generický node (styl podle NodeShell.tsx) ────────── */
+.data-node {
+    position: relative;
+    min-width: 200px;
+    background: var(--ned-surface);
+    border: 1px solid var(--ned-border);
+    border-radius: 6px;
+    box-shadow: none;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 12px;
+    color: var(--ned-text);
+    user-select: none;
+    overflow: visible;
+    isolation: isolate;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+
+.data-node.node-selected {
+    border: 2px solid var(--ned-accent);
+}
+
+/* ── Validace: vadný node ───────────────────────────── */
+.data-node.node-invalid {
+    border: 2px solid var(--ned-danger);
+}
+
+.data-node.node-warn {
+    border: 2px solid var(--ned-warning);
+}
+
+.dn-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    z-index: 5;
+    border: 2px solid var(--ned-surface);
+    box-shadow: none;
+    cursor: default;
+}
+
+.dn-badge-err { background: var(--ned-danger); }
+.dn-badge-warn { background: var(--ned-warning); color: #1a1206; }
+
+/* ── Header ──────────────────────────────────────────── */
+.dn-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 5px 5px 0 0;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: .4px;
+    text-shadow: none;
+}
+
+.dn-icon { font-size: 14px; font-weight: 850; line-height: 1; }
+.dn-title { flex: 1; }
+
+/* ── Ports section: inputs LEFT, output RIGHT ────────── */
+.dn-ports {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+}
+
+.dn-inputs { flex: 1; }
+.dn-outputs { flex: 0 0 auto; }
+
+.dn-port-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 16px;
+    color: #ddd;
+}
+
+.dn-array { height: 36px; }          /* array řádek je vyšší */
+.dn-out-row { justify-content: flex-end; }
+
+.dn-port-label {
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* ── Port handle ──────────────────────────────────────────
+   Stylujeme přes řádek-wrapper: --pc (barva typu) se dědí na
+   vnořený .diagram-port. Nezávisí to na tom, jestli PortRenderer
+   předává Class/Style. .has-links přidává sám ZBD při napojení. */
+.dn-port-row .diagram-port {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    box-sizing: border-box;
+    border: 3px solid var(--pc, #8a93a8);
+    background: color-mix(in srgb, var(--pc, #8a93a8) 22%, transparent);
+    border-radius: 50%;
+    cursor: crosshair;
+    transition: background .15s ease, filter .15s ease;
+    z-index: 3;
+}
+
+.dn-in-row  .diagram-port { left: -6px; }
+.dn-out-row .diagram-port { right: -6px; }
+
+/* array → protáhlý ovál; optional → hranatý */
+.dn-array    .diagram-port { height: 24px; border-radius: 10px; }
+.dn-optional .diagram-port { width: 12px; height: 12px; border-radius: 3px; }
+/* exec → štítek. Tvar dělá maska (viz --ned-exec-*), proto žádný rámeček ani poloměr:
+   obrys je součástí masky, ne borderu. Širší než vysoký, tak si sáhne dál z uzlu. */
+.dn-port-row.dn-exec .diagram-port {
+    width: 18px;
+    height: 15px;
+    border: none;
+    border-radius: 0;
+    background: var(--pc, #8a93a8);
+    -webkit-mask: var(--ned-exec-outline) center / contain no-repeat;
+    mask: var(--ned-exec-outline) center / contain no-repeat;
+}
+
+.dn-in-row.dn-exec  .diagram-port { left: -8px; }
+.dn-out-row.dn-exec .diagram-port { right: -8px; }
+
+/* napojený → plná výplň barvou typu (dn-conn = náš render, has-links = live od ZBD) */
+.dn-port-row.dn-conn .diagram-port,
+.dn-port-row .diagram-port.has-links {
+    background: var(--pc, #8a93a8);
+}
+
+/* exec napojený → plný štítek. Barvu už nastavilo pravidlo výš, tady se mění jen maska. */
+.dn-port-row.dn-exec.dn-conn .diagram-port,
+.dn-port-row.dn-exec .diagram-port.has-links {
+    -webkit-mask-image: var(--ned-exec-filled);
+    mask-image: var(--ned-exec-filled);
+}
+
+.dn-port-row .diagram-port:hover { filter: brightness(1.35); }
+
+/* ── Spoje (links/edges) — neutrální místo zlaté z v1 ──── */
+.diagram-link path,
+.diagram-link .diagram-link-path {
+    stroke: var(--ned-text-subtle);
+    stroke-width: 3;
+    fill: none;
+}
+
+.diagram-link.selected path,
+.diagram-link.selected .diagram-link-path {
+    stroke: var(--ned-accent);
+}
+
+/* ── Fields section ──────────────────────────────────── */
+.dn-body {
+    padding: 8px 12px 10px;
+    border-top: 1px solid var(--ned-border);
+}
+
+.dn-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+/* Checkbox pole: label + checkbox spolu vlevo (ne roztažené přes celou šířku). */
+.dn-field-check { justify-content: flex-start; gap: 10px; }
+
+.dn-field-label { color: #8a8f9e; font-size: 11.5px; font-weight: 500; }
+
+/* ── Missing node (placeholder za nerozpoznaný typ) ──── */
+.dn-field-ro {
+    color: #c8ccd8;
+    font-size: 11px;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dn-missing-type {
+    color: var(--ned-danger);
+    font-size: 10.5px;
+    padding-bottom: 4px;
+    word-break: break-all;
+}
+
+.dn-input {
+    width: 110px;
+    background: var(--ned-bg);
+    border: 1px solid var(--ned-border);
+    border-radius: 6px;
+    color: var(--ned-text);
+    padding: 4px 8px;
+    font-size: 11px;
+    font-family: inherit;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+
+.dn-input:focus { outline: none; border-color: var(--ned-accent); background: var(--ned-surface-muted); }
+.dn-check {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--ned-accent);
+    cursor: pointer;
+}
+
+/* ── Home Screen ──────────────────────────────────────── */
+.ne-home {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: var(--ned-bg);
+    color: var(--ned-text);
+    padding: 40px;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+.ne-home-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.ne-home-title {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    color: var(--ned-text);
+}
+
+.ne-home-subtitle {
+    font-size: 14px;
+    color: var(--ned-text-subtle);
+}
+
+.ne-home-grid {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    align-items: center;
+}
+
+.ne-home-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 200px;
+    background: var(--ned-surface);
+    border: 1px solid var(--ned-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color .15s, border-color .15s;
+    box-shadow: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.ne-home-card:hover {
+    background: var(--ned-surface-hover);
+    border-color: var(--ned-accent);
+    box-shadow: none;
+}
+
+.ne-home-card:active { background: var(--ned-surface-muted); }
+
+.ne-home-card-icon {
+    font-size: 56px !important;
+    width: 56px !important;
+    height: 56px !important;
+    color: var(--ned-accent);
+    margin-bottom: 16px;
+    transition: transform 0.25s, color 0.25s;
+    z-index: 1;
+}
+
+.ne-home-card:hover .ne-home-card-icon {
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.ne-home-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #a6adbb;
+    transition: color 0.25s;
+    z-index: 1;
+}
+
+.ne-home-card:hover .ne-home-card-title {
+    color: #ffffff;
+}
+
+.ne-home-card-desc {
+    font-size: 11px;
+    color: #5d6275;
+    margin-top: 4px;
+    transition: color 0.25s;
+    z-index: 1;
+}
+
+.ne-home-card:hover .ne-home-card-desc {
+    color: #8c93ad;
+}
+
+/* ── MudBlazor Global & Dialog Override Theme ───────── */
+.mud-dialog {
+    background-color: var(--ned-surface) !important;
+    border: 1px solid var(--ned-border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+.mud-dialog-title {
+    padding: 20px 24px 12px 24px !important;
+    border-bottom: 1px solid #1c223a;
+}
+
+.mud-dialog-title .mud-typography {
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    letter-spacing: 0.5px;
+}
+
+.mud-dialog-content {
+    padding: 20px 24px !important;
+}
+
+.mud-dialog-actions {
+    padding: 12px 24px 20px 24px !important;
+    border-top: 1px solid #1c223a;
+    gap: 12px;
+}
+
+/* MudBlazor Input Field Overrides (Outlined) */
+.mud-input-outlined {
+    background-color: var(--ned-bg) !important;
+}
+
+.mud-input-outlined.mud-input-outlined-with-label .mud-input-outlined-border {
+    border-color: var(--ned-border) !important;
+}
+
+.mud-input-outlined:hover .mud-input-outlined-border {
+    border-color: var(--ned-primary) !important;
+}
+
+.mud-input-outlined.mud-input-focus .mud-input-outlined-border {
+    border-color: var(--ned-accent) !important;
+}
+
+.mud-label {
+    color: #8a8f9e !important;
+}
+
+.mud-input-focus .mud-label {
+    color: var(--ned-accent) !important;
+}
+
+/* MudBlazor Button Overrides */
+.mud-button-filled {
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px !important;
+    transition: all 0.2s ease !important;
+}
+
+.mud-button-filled-primary {
+    background-color: var(--ned-primary) !important;
+}
+
+.mud-button-filled-primary:hover {
+    background-color: var(--ned-accent) !important;
+    color: var(--ned-bg) !important;
+    box-shadow: none !important;
+}
+
+.mud-button-outlined {
+    border-radius: 6px !important;
+    border-color: #282c3f !important;
+    color: #e0e2ea !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+.mud-button-outlined:hover {
+    border-color: var(--ned-primary) !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+.mud-button-text {
+    border-radius: 6px !important;
+    color: #8a8f9e !important;
+    font-weight: 600 !important;
+}
+
+.mud-button-text:hover {
+    color: #e0e2ea !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Položka MudToggleGroup je taky .mud-button-text, takže ji override výš chytal —
+   a jeho 6px rádius je větší než 4px, na které skupina klipuje svým overflow:hidden.
+   Výplň se pak v krajních rozích odtáhla od obrysu a prosvítalo mezi nimi pozadí.
+   Skupina si zaoblení řeší sama; položka musí zůstat hranatá. */
+.mud-toggle-group > .mud-toggle-item {
+    border-radius: 0 !important;
+}
+
+.mud-popover,
+.mud-popover-open,
+.mud-menu .mud-popover,
+.mud-popover-provider .mud-popover {
+    background-color: var(--ned-surface) !important;
+    border: 1px solid var(--ned-border) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+    border-radius: 8px !important;
+    min-width: max-content !important;
+    width: auto !important;
+}
+
+.mud-list,
+.mud-menu-list {
+    background-color: transparent !important;
+    padding: 4px !important;
+    min-width: max-content !important;
+    width: 100% !important;
+}
+
+/* MudSelect dává overflow-y:auto popoveru i vnitřnímu seznamu. Scrolluje jen
+   seznam, jinak WebView2 vykreslí dva svislé scrollbary vedle sebe. */
+.mud-popover:has(> .mud-list) {
+    overflow-y: hidden !important;
+}
+
+.mud-list-item,
+.mud-menu-item {
+    border-radius: 6px !important;
+    color: #c7cad6 !important;
+    font-size: 13px !important;
+    transition: background-color 0.15s, color 0.15s !important;
+    margin: 2px 0 !important;
+    white-space: nowrap !important;
+    padding-right: 28px !important;
+    box-sizing: border-box !important;
+    min-width: max-content !important;
+    width: 100% !important;
+}
+
+.mud-list-item-icon,
+.mud-list-item-icon *,
+.mud-menu-item .mud-icon-root,
+.mud-list-item .mud-icon-root {
+    color: #ffffff !important;
+    font-size: 18px !important;
+}
+
+.mud-list-item:hover, .mud-list-item.mud-selected:hover,
+.mud-menu-item:hover {
+    background-color: rgba(47, 87, 138, 0.15) !important;
+    color: #ffffff !important;
+}
+
+.mud-list-item.mud-selected {
+    background-color: color-mix(in srgb, var(--ned-accent) 10%, transparent) !important;
+    color: var(--ned-accent) !important;
+    font-weight: 600 !important;
+}
+
+/* ── Instance editor ──────────────────────────────── */
+
+.ie-container {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 32px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.ie-header {
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--ned-border);
+    padding-bottom: 12px;
+}
+
+.ie-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    color: #e0e2ea;
+}
+
+.ie-subtitle {
+    font-size: 0.8rem;
+    color: #8a8f9e;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ie-name-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.ie-name-input {
+    flex: 1;
+    background: #1c1e2a;
+    border: 1px solid #2a2d3e;
+    border-radius: 4px;
+    padding: 6px 10px;
+    color: #e0e2ea;
+    font-size: 0.85rem;
+}
+
+.ie-name-input:focus {
+    outline: none;
+    border-color: var(--ned-accent);
+}
+
+.ie-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ie-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ie-field-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #c0c2ca;
+}
+
+.ie-field-type {
+    font-size: 0.7rem;
+    color: #6a6f7e;
+}
+
+.ie-field-input {
+    max-width: 400px;
+}
+
+.ie-field-input .dn-input,
+.ie-field-input .dn-check {
+    width: 100%;
+    font-size: 0.85rem;
+}
+
+.ie-error,
+.ie-empty {
+    padding: 24px;
+    text-align: center;
+    color: #8a8f9e;
+    font-style: italic;
+}
+
+.ie-error {
+    color: var(--ned-danger);
+}
+
+/* ── Library panel: instance entries ──────────────── */
+
+.lp-instance {
+    padding-left: 16px;
+}
+
+.lp-kind-inst {
+    opacity: 0.7;
+}
+
+.lp-kind-orphan {
+    color: var(--ned-danger);
+    opacity: 1;
+}
+
+/* ── NED Tooltip (MudTooltip override) ─────────────
+   Wrapper kolem dětí: musí být block, jinak inline-block láme
+   layout nodu (porty by tekly vedle sebe místo pod sebe). */
+.ned-tooltip-root {
+    display: block;
+}
+
+/* Bublina tooltipu (TooltipContent). */
+.mud-popover.ned-tooltip {
+    background: #1a1c28;
+    color: #e0e2e8;
+    border: 1px solid #3a3d52;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    line-height: 1.45;
+    /* Přepíše globální min-width:max-content i inline max-width:none z MudPopoveru. */
+    width: fit-content !important;
+    max-width: min(360px, calc(100vw - 24px)) !important;
+    min-width: 0 !important;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: left;
+    align-items: flex-start;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
+    /* Bublina nesmí krást hover. Spawnuje se blízko kurzoru a může překrýt port;
+       kdyby brala pointer-events, vznikne smyčka: myš na portu → tooltip přes kurzor
+       → myš „opustí" port → tooltip zmizí → myš zas vidí port → … (blikání kurzoru). */
+    pointer-events: none;
+}
+
+/* Pojistka: ani obalový MudPopover (a šipka) kolem bubliny nesmí krást hover —
+   jinak by smyčka přetrvala i s průhlednou bublinou (overlap stejných pixelů). */
+.mud-popover:has(.ned-tooltip),
+.ned-tooltip .mud-tooltip-arrow {
+    pointer-events: none;
+}
+
+.ned-tooltip .ned-tip-type {
+    color: #a2abbf;
+    font-family: "Cascadia Code", "Consolas", monospace;
+    font-size: 11px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.ned-tooltip .ned-tip-desc {
+    color: #cbd0dc;
+    margin-top: 2px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}

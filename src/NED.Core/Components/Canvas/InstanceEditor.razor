@@ -1,0 +1,57 @@
+@namespace NED.Core
+@using NED.Abstractions.Manifest
+@inject NedCatalog Catalog
+@inject AssetIndex AssetIndex
+@inject IStringLocalizer<Strings> Loc
+
+<div class="ie-container">
+    <div class="ie-header">
+        <h2 class="ie-title">@Tab.Data.TemplateName</h2>
+        <span class="ie-subtitle">@Loc["InstanceEditor_Instance"]</span>
+    </div>
+
+    <div class="ie-name-row">
+        <label class="ie-field-label">@Loc["InstanceEditor_NameLabel"]</label>
+        <input class="ie-name-input" type="text" value="@Tab.Data.Name"
+               @onchange="@(e => Tab.Data.Name = e.Value?.ToString() ?? string.Empty)" placeholder="@Loc["InstanceEditor_NamePlaceholder"]" />
+    </div>
+
+    @if (Tab.TemplateInterface is null)
+    {
+        <div class="ie-error">@Loc["InstanceEditor_TemplateNotFound"]</div>
+    }
+    else if (Tab.TemplateInterface.Inputs.Count == 0)
+    {
+        <div class="ie-empty">@Loc["InstanceEditor_NoInputs"]</div>
+    }
+    else
+    {
+        <div class="ie-form">
+            @foreach (var inp in Tab.TemplateInterface.Inputs)
+            {
+                var isComplex = !TypeIds.IsScalar(inp.Type);
+                <div class="ie-field">
+                    <label class="ie-field-label">@inp.Name</label>
+                    <span class="ie-field-type">@TypeIds.Friendly(inp.Type)</span>
+                    <div class="ie-field-input">
+                        <NodeFieldInput TypeId="inp.Type" IsComplex="isComplex"
+                                        Value="@GetValue(inp.Name)"
+                                        OnChange="v => SetValue(inp.Name, v)" />
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public InstanceTab Tab { get; set; } = null!;
+
+    private string GetValue(string name) =>
+        Tab.Data.Values.TryGetValue(name, out var v) ? v : "";
+
+    private void SetValue(string name, object? raw)
+    {
+        Tab.Data.Values[name] = raw?.ToString() ?? "";
+    }
+}

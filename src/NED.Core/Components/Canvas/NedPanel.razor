@@ -1,0 +1,40 @@
+@namespace NED.Core
+@implements IDisposable
+@* Deklarativní registrace dokovatelného panelu. Sám nic nevykresluje —
+   jen se zaregistruje u rodičovského NedDockHostu, který jeho obsah (ChildContent)
+   vyrenderuje do portálu, vyrobí golden-layout konfiguraci a WINDOW ▸ Panels příkaz.
+   Přidání panelu = jeden <NedPanel Id="…" Title="…">…obsah…</NedPanel>. *@
+
+@code {
+    [CascadingParameter] private NedDockHost? Host { get; set; }
+
+    /// <summary>Identifikátor panelu — golden-layout componentType i data-portal atribut. Bez '/'.</summary>
+    [Parameter, EditorRequired] public string Id { get; set; } = default!;
+
+    /// <summary>Popisek panelu — titulek tabu i položka v WINDOW ▸ Panels. Bez '/'.</summary>
+    [Parameter, EditorRequired] public string Title { get; set; } = default!;
+
+    /// <summary>Volitelná ikona pro položku v WINDOW ▸ Panels (Material ikona).</summary>
+    [Parameter] public string? Icon { get; set; }
+
+    /// <summary>Počáteční šířka panelu v procentech ve výchozím layoutu (jen pro Dock="side").</summary>
+    [Parameter] public double DefaultWidth { get; set; } = 20;
+
+    /// <summary>Ke které hraně se panel ve výchozím layoutu doká: "side" (vedle editoru, řádek) nebo "bottom".</summary>
+    [Parameter] public string Dock { get; set; } = "side";
+
+    /// <summary>Počáteční výška panelu v procentech ve výchozím layoutu (jen pro Dock="bottom").</summary>
+    [Parameter] public double DefaultHeight { get; set; } = 22;
+
+    /// <summary>Obsah panelu — renderuje ho host do portálu.</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (Host is null)
+            throw new InvalidOperationException($"<NedPanel> musí být uvnitř <NedDockHost> (Id='{Id}').");
+        Host.RegisterPanel(this);
+    }
+
+    public void Dispose() => Host?.UnregisterPanel(this);
+}

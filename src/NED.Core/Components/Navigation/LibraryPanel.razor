@@ -1,0 +1,236 @@
+﻿@namespace NED.Core
+@* Pravý panel: seznam importovaných knihoven → otevírání grafů.
+   Pravý klik na asset → kontext menu (Explorer / VS Code / rename / duplicate / delete). *@
+@inject AssetIndex AssetIndex
+@inject IStringLocalizer<Strings> Loc
+@implements IDisposable
+
+<div class="lp-panel">
+    <div class="lp-content">
+        @if (AssetIndex.Roots.Count == 0)
+        {
+            <div class="lp-empty">@Loc["LibraryPanel_NoLibrary"]</div>
+        }
+        else
+        {
+            <MudNavMenu>
+                @foreach (var root in AssetIndex.Roots)
+                {
+                    var rootTrimmed = root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                    var rootName = Path.GetFileName(rootTrimmed);
+                    var rootPrefix = rootTrimmed + Path.DirectorySeparatorChar;
+                    var entries = AssetIndex.Entries
+                        .Where(e => e.Path.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase))
+                        .OrderBy(e => e.Name)
+                        .ToList();
+
+                    @* Instance, jejichž šablona chybí (smazaný/nenačitatelný soubor) — bez téhle
+                       sekce by v panelu nešly nikdy najít ani otevřít/smazat. *@
+                    var orphanInstances = AssetIndex.InstanceEntries
+                        .Where(i => i.Path.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase))
+                        .Where(i => AssetIndex.Resolve(i.TemplateId) is null)
+                        .OrderBy(i => i.Name)
+                        .ToList();
+
+                    <MudNavGroup Title="@rootName" Expanded="true" Icon="@Icons.Material.Filled.Folder">
+                        @if (entries.Count == 0 && orphanInstances.Count == 0)
+                        {
+                            <MudNavLink Disabled="true">
+                                <span class="lp-empty-item">@Loc["LibraryPanel_Empty"]</span>
+                            </MudNavLink>
+                        }
+                        else
+                        {
+                            @foreach (var entry in entries)
+                            {
+                                <div @oncontextmenu="e => OpenMenu(entry, e)" @oncontextmenu:preventDefault="true">
+                                    <MudNavLink OnClick="@(() => Open(entry))">
+                                        <span class="lp-kind">@GraphIcons.For(entry.Flow)</span>
+                                        @entry.Name
+                                    </MudNavLink>
+                                </div>
+
+                                @if (entry.Instanceable)
+                                {
+                                    @foreach (var inst in AssetIndex.InstancesOf(entry.Id))
+                                    {
+                                        <div class="lp-instance" @oncontextmenu="e => OpenInstanceMenu(inst, e)" @oncontextmenu:preventDefault="true">
+                                            <MudNavLink OnClick="@(() => OnOpenInstance.InvokeAsync(inst))">
+                                                <span class="lp-kind lp-kind-inst">⚙</span>
+                                                @inst.Name
+                                            </MudNavLink>
+                                        </div>
+                                    }
+                                }
+                            }
+
+                            @foreach (var inst in orphanInstances)
+                            {
+                                <div class="lp-instance" @oncontextmenu="e => OpenInstanceMenu(inst, e)" @oncontextmenu:preventDefault="true">
+                                    <MudNavLink OnClick="@(() => OnOpenInstance.InvokeAsync(inst))">
+                                        <span class="lp-kind lp-kind-inst lp-kind-orphan">⚙</span>
+                                        @inst.Name
+                                    </MudNavLink>
+                                </div>
+                            }
+                        }
+                    </MudNavGroup>
+                }
+            </MudNavMenu>
+        }
+    </div>
+
+    <div class="lp-footer">
+        <button class="lp-manage-btn" @onclick="() => OnManageLibraries.InvokeAsync()">
+            <span class="nc-ic">📁</span> @Loc["LibraryPanel_Manage"]
+        </button>
+    </div>
+</div>
+
+@* Asset context menu *@
+@if (_menuOpen && _menuAsset is not null)
+{
+    <div class="np-backdrop" @onclick="CloseMenu" @oncontextmenu="CloseMenu" @oncontextmenu:preventDefault="true"></div>
+    <div class="nc-menu" style="left:@(_menuX)px; top:@(_menuY)px;" @onclick:stopPropagation
+         @oncontextmenu:preventDefault="true">
+        @if (_menuAsset.Instanceable)
+        {
+            <div class="nc-item" @onclick="() => FireNewInstance()">
+                <span class="nc-ic">⚙</span> @Loc["LibraryPanel_NewInstance"]
+            </div>
+            <div class="nc-sep"></div>
+        }
+        <div class="nc-item" @onclick="() => Fire(OnRevealAsset)">
+            <span class="nc-ic">🗁</span> @Loc["LibraryPanel_OpenInExplorer"]
+        </div>
+        <div class="nc-item" @onclick="() => Fire(OnOpenInEditor)">
+            <span class="nc-ic">‹›</span> @Loc["LibraryPanel_OpenInEditor"]
+        </div>
+        <div class="nc-sep"></div>
+        <div class="nc-item" @onclick="() => Fire(OnRenameAsset)">
+            <span class="nc-ic">✎</span> @Loc["LibraryPanel_Rename"]
+        </div>
+        <div class="nc-item" @onclick="() => Fire(OnDuplicateAsset)">
+            <span class="nc-ic">⧉</span> @Loc["LibraryPanel_Duplicate"]
+        </div>
+        <div class="nc-sep"></div>
+        <div class="nc-item nc-danger" @onclick="() => Fire(OnDeleteAsset)">
+            <span class="nc-ic">🗑</span> @Loc["LibraryPanel_Delete"]
+        </div>
+    </div>
+}
+
+@* Instance context menu *@
+@if (_instMenuOpen && _instMenuEntry is not null)
+{
+    <div class="np-backdrop" @onclick="CloseInstanceMenu" @oncontextmenu="CloseInstanceMenu" @oncontextmenu:preventDefault="true"></div>
+    <div class="nc-menu" style="left:@(_instMenuX)px; top:@(_instMenuY)px;" @onclick:stopPropagation
+         @oncontextmenu:preventDefault="true">
+        <div class="nc-item" @onclick="() => FireInstanceOpen()">
+            <span class="nc-ic">⚙</span> @Loc["LibraryPanel_OpenInstance"]
+        </div>
+        <div class="nc-sep"></div>
+        <div class="nc-item nc-danger" @onclick="() => FireInstanceDelete()">
+            <span class="nc-ic">🗑</span> @Loc["LibraryPanel_Delete"]
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public EventCallback<AssetEntry> OnOpenAsset { get; set; }
+    [Parameter] public EventCallback<AssetEntry> OnRevealAsset { get; set; }
+    [Parameter] public EventCallback<AssetEntry> OnOpenInEditor { get; set; }
+    [Parameter] public EventCallback<AssetEntry> OnRenameAsset { get; set; }
+    [Parameter] public EventCallback<AssetEntry> OnDuplicateAsset { get; set; }
+    [Parameter] public EventCallback<AssetEntry> OnDeleteAsset { get; set; }
+
+    [Parameter] public EventCallback<AssetEntry> OnNewInstance { get; set; }
+    [Parameter] public EventCallback<InstanceEntry> OnOpenInstance { get; set; }
+    [Parameter] public EventCallback<InstanceEntry> OnDeleteInstance { get; set; }
+    [Parameter] public EventCallback OnManageLibraries { get; set; }
+
+    // Asset menu state
+    private bool _menuOpen;
+    private double _menuX, _menuY;
+    private AssetEntry? _menuAsset;
+
+    // Instance menu state
+    private bool _instMenuOpen;
+    private double _instMenuX, _instMenuY;
+    private InstanceEntry? _instMenuEntry;
+
+    protected override void OnInitialized()
+    {
+        AssetIndex.Changed += Refresh;
+    }
+
+    private async Task Open(AssetEntry entry) =>
+        await OnOpenAsset.InvokeAsync(entry);
+
+    // ── Asset context menu ──────────────────────────
+
+    private void OpenMenu(AssetEntry entry, MouseEventArgs e)
+    {
+        _menuAsset = entry;
+        _menuX = e.ClientX;
+        _menuY = e.ClientY;
+        _menuOpen = true;
+    }
+
+    private void CloseMenu()
+    {
+        _menuOpen = false;
+        _menuAsset = null;
+    }
+
+    private async Task Fire(EventCallback<AssetEntry> cb)
+    {
+        var asset = _menuAsset;
+        CloseMenu();
+        if (asset is not null) await cb.InvokeAsync(asset);
+    }
+
+    private async Task FireNewInstance()
+    {
+        var asset = _menuAsset;
+        CloseMenu();
+        if (asset is not null) await OnNewInstance.InvokeAsync(asset);
+    }
+
+    // ── Instance context menu ───────────────────────
+
+    private void OpenInstanceMenu(InstanceEntry inst, MouseEventArgs e)
+    {
+        _instMenuEntry = inst;
+        _instMenuX = e.ClientX;
+        _instMenuY = e.ClientY;
+        _instMenuOpen = true;
+    }
+
+    private void CloseInstanceMenu()
+    {
+        _instMenuOpen = false;
+        _instMenuEntry = null;
+    }
+
+    private async Task FireInstanceOpen()
+    {
+        var inst = _instMenuEntry;
+        CloseInstanceMenu();
+        if (inst is not null) await OnOpenInstance.InvokeAsync(inst);
+    }
+
+    private async Task FireInstanceDelete()
+    {
+        var inst = _instMenuEntry;
+        CloseInstanceMenu();
+        if (inst is not null) await OnDeleteInstance.InvokeAsync(inst);
+    }
+
+    private void Refresh() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        AssetIndex.Changed -= Refresh;
+    }
+}

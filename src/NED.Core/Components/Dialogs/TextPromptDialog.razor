@@ -1,0 +1,46 @@
+@namespace NED.Core
+@inject IStringLocalizer<Strings> Loc
+@* Generický prompt na jeden řádek textu (rename apod.). *@
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="_value" Label="@Label" Variant="Variant.Outlined"
+                      Immediate="true" AutoFocus="true" Class="mt-1"
+                      OnKeyDown="OnKey" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">@Loc["TextPromptDialog_Cancel"]</MudButton>
+        <MudButton Color="MudBlazor.Color.Primary" Variant="Variant.Filled"
+                   Disabled="string.IsNullOrWhiteSpace(_value)" OnClick="Ok">@OkText</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter] public string Label { get; set; } = null!;
+    [Parameter] public string OkText { get; set; } = null!;
+    [Parameter] public string Initial { get; set; } = "";
+
+    private string _value = "";
+
+    protected override void OnInitialized()
+    {
+        _value = Initial;
+        if (Label == null) Label = Loc["TextPromptDialog_Label"].Value;
+        if (OkText == null) OkText = Loc["TextPromptDialog_OkText"].Value;
+    }
+
+    private void Ok()
+    {
+        if (!string.IsNullOrWhiteSpace(_value))
+            Dialog.Close(DialogResult.Ok(_value.Trim()));
+    }
+
+    private void Cancel() => Dialog.Cancel();
+
+    private void OnKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") Ok();
+    }
+}

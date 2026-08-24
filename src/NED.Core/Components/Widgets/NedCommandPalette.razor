@@ -1,0 +1,168 @@
+@namespace NED.Core
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+@inject IStringLocalizer<Strings> Loc
+@* Command palette — Ctrl+K. Naviguje stromem NedCommandRegistry (submenu = drill-in). *@
+
+<div class="ne-palette-overlay" @onclick="Close">
+    <div class="ne-palette-popup" @onclick:stopPropagation="true">
+
+        @if (_path.Count > 0 && !Searching)
+        {
+            <div class="ne-palette-back" @onclick="GoBack">
+                <span class="ne-palette-back-arrow">‹</span>
+                @string.Join(" › ", _path.Select(p => p.Name))
+            </div>
+        }
+
+        <input class="ne-palette-search"
+               type="text" autocomplete="off" spellcheck="false"
+               placeholder="@Loc["Palette_Placeholder"]"
+               value="@_query" @oninput="OnQueryInput" @onkeydown="OnKey" />
+
+        <div class="ne-palette-list">
+            @{
+                var items = Visible().ToList();
+                if (_highlight >= items.Count) _highlight = Math.Max(0, items.Count - 1);
+            }
+            @for (var i = 0; i < items.Count; i++)
+            {
+                var item = items[i];
+                var cls = "ne-palette-item"
+                    + (i == _highlight ? " ne-palette-hl" : "")
+                    + (!item.IsEnabled ? " ne-palette-item-disabled" : "");
+                <div class="@cls" @onclick="() => Pick(item)">
+                    @if (item.Icon is not null)
+                    {
+                        <MudIcon Icon="@item.Icon" Size="MudBlazor.Size.Small" Class="ne-palette-icon" />
+                    }
+                    <span class="ne-palette-label">@Label(item)</span>
+                    @if (Searching)
+                    {
+                        <span class="ne-palette-cat-badge">@Loc[Category(item)]</span>
+                    }
+                    @if (item.IsGroup)
+                    {
+                        <span class="ne-palette-submenu-arrow">›</span>
+                    }
+                    else if (item.Shortcut is not null)
+                    {
+                        <span class="ne-palette-shortcut">@item.Shortcut</span>
+                    }
+                </div>
+            }
+            @if (items.Count == 0)
+            {
+                <div class="ne-palette-empty">—</div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public NedCommandRegistry Commands { get; set; } = default!;
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private string _query = "";
+    private int _highlight;
+    private readonly List<NedCommandNode> _path = new();   // řetězec skupin root→aktuální
+
+    private bool Searching => !string.IsNullOrWhiteSpace(_query);
+
+    private IReadOnlyList<NedCommandNode> CurrentScope =>
+        _path.Count == 0 ? Commands.Roots : _path[^1].Children;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) await Invoke("focusPaletteSearch");
+    }
+
+    private IEnumerable<NedCommandNode> Visible()
+    {
+        if (Searching)
+            return Commands.AllLeaves()
+                .Where(n => Label(n).Contains(_query, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(n => Label(n));
+
+        return CurrentScope.OrderBy(n => n.Order).ThenBy(n => n.Name);
+    }
+
+    private string Label(NedCommandNode n) =>
+        n.Localize ? Loc[NedCommandRegistry.KeyOf(n.FullPath)] : n.Name;
+
+    private static string Category(NedCommandNode node)
+    {
+        var slash = node.FullPath.IndexOf('/');
+        return slash > 0 ? node.FullPath[..slash] : node.Name;
+    }
+
+    private void OnQueryInput(ChangeEventArgs e)
+    {
+        _query = e.Value?.ToString() ?? "";
+        _highlight = 0;
+    }
+
+    private async Task Pick(NedCommandNode item)
+    {
+        if (!item.IsEnabled) return;
+
+        if (item.IsGroup)
+        {
+            // Drill-in: jen ve scope view (při hledání jsou výsledky vždy listy).
+            _path.Add(item);
+            _query = "";
+            _highlight = 0;
+            return;
+        }
+
+        await OnClose.InvokeAsync();
+        if (item.Execute is not null) await item.Execute();
+    }
+
+    private void GoBack()
+    {
+        if (_path.Count == 0) return;
+        _path.RemoveAt(_path.Count - 1);
+        _query = "";
+        _highlight = 0;
+    }
+
+    private async Task OnKey(KeyboardEventArgs e)
+    {
+        var items = Visible().ToList();
+        var count = items.Count;
+
+        switch (e.Key)
+        {
+            case "ArrowDown":
+                if (count > 0) { _highlight = (_highlight + 1) % count; await Invoke("scrollPaletteHighlight"); }
+                break;
+            case "ArrowUp":
+                if (count > 0) { _highlight = (_highlight - 1 + count) % count; await Invoke("scrollPaletteHighlight"); }
+                break;
+            case "Enter":
+                if (count > 0 && _highlight < count) await Pick(items[_highlight]);
+                break;
+            case "Escape":
+                if (_path.Count > 0) GoBack();
+                else await OnClose.InvokeAsync();
+                break;
+            case "Backspace":
+                if (string.IsNullOrEmpty(_query) && _path.Count > 0) GoBack();
+                break;
+        }
+    }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+
+    private async Task Invoke(string fn)
+    {
+        try
+        {
+            var module = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/NED.Core/ned-keys.js");
+            await module.InvokeVoidAsync(fn);
+        }
+        catch { }
+    }
+}

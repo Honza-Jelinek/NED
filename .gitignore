@@ -1,0 +1,18 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+.codex/
+.suskint-claude/
+
+# VS / Rider
+.vs/
+.idea/
+*.user
+
+# Misc
+run_stdout.txt
+run_stderr.txt
+
+graphify-out/
+# Snapshot testy — neschválený výstup
+*.received.json

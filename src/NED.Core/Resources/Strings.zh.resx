@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="xml:space" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>1.3</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="File_New" xml:space="preserve"><value>新建</value></data>
+  <data name="File_Save" xml:space="preserve"><value>保存</value></data>
+  <data name="Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="NedMenuBar_File" xml:space="preserve"><value>文件</value></data>
+  <data name="NedMenuBar_Edit" xml:space="preserve"><value>编辑</value></data>
+  <data name="NedMenuBar_Window" xml:space="preserve"><value>窗口</value></data>
+  <data name="Window_Language" xml:space="preserve"><value>语言</value></data>
+  <data name="File_Open" xml:space="preserve"><value>打开</value></data>
+  <data name="File_SaveAs" xml:space="preserve"><value>另存为…</value></data>
+  <data name="File_Export" xml:space="preserve"><value>导出</value></data>
+  <data name="File_ManageLibraries" xml:space="preserve"><value>管理库</value></data>
+  <data name="Edit_Undo" xml:space="preserve"><value>撤销</value></data>
+  <data name="Edit_Redo" xml:space="preserve"><value>重做</value></data>
+  <data name="ManageLibraries_Info1" xml:space="preserve"><value>库是扫描的文件夹</value></data>
+  <data name="ManageLibraries_Info2" xml:space="preserve"><value>索引的子图将出现在调色板中。</value></data>
+  <data name="ManageLibraries_NoLibrary" xml:space="preserve"><value>暂无库。</value></data>
+  <data name="ManageLibraries_FolderPath" xml:space="preserve"><value>文件夹路径</value></data>
+  <data name="ManageLibraries_Browse" xml:space="preserve"><value>浏览</value></data>
+  <data name="ManageLibraries_Add" xml:space="preserve"><value>添加</value></data>
+  <data name="HomeScreen_Subtitle" xml:space="preserve"><value>创建新图表或打开现有文件</value></data>
+  <data name="HomeScreen_NewGraphTitle" xml:space="preserve"><value>新图表</value></data>
+  <data name="HomeScreen_NewGraphDesc" xml:space="preserve"><value>创建空白画布</value></data>
+  <data name="HomeScreen_OpenFileTitle" xml:space="preserve"><value>打开文件</value></data>
+  <data name="HomeScreen_OpenFileDesc" xml:space="preserve"><value>加载现有图表</value></data>
+  <data name="TextPromptDialog_Label" xml:space="preserve"><value>标签</value></data>
+  <data name="TextPromptDialog_OkText" xml:space="preserve"><value>确定</value></data>
+  <data name="TextPromptDialog_Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="PortContextMenu_ConvertToField" xml:space="preserve"><value>转换为字段</value></data>
+  <data name="PortContextMenu_ConvertToPort" xml:space="preserve"><value>转换为端口</value></data>
+  <data name="NodeContextMenu_Duplicate" xml:space="preserve"><value>复制</value></data>
+  <data name="NodeContextMenu_Refresh" xml:space="preserve"><value>刷新</value></data>
+  <data name="NodeContextMenu_Delete" xml:space="preserve"><value>删除</value></data>
+  <data name="InstanceEditor_Instance" xml:space="preserve"><value>实例</value></data>
+  <data name="InstanceEditor_NameLabel" xml:space="preserve"><value>名称</value></data>
+  <data name="InstanceEditor_NamePlaceholder" xml:space="preserve"><value>可选</value></data>
+  <data name="InstanceEditor_TemplateNotFound" xml:space="preserve"><value>在库中未找到模板。</value></data>
+  <data name="InstanceEditor_NoInputs" xml:space="preserve"><value>此模板没有输入参数。</value></data>
+  <data name="Validation_MissingType" xml:space="preserve"><value>缺失的节点类型：{0}</value></data>
+  <data name="MissingNode_MissingType" xml:space="preserve"><value>缺失类型</value></data>
+  <data name="Notice_SaveFailed" xml:space="preserve"><value>保存“{0}”失败。</value></data>
+  <data name="Notice_ExportFailed" xml:space="preserve"><value>导出“{0}”失败。</value></data>
+  <data name="Notice_FileReadFailed" xml:space="preserve"><value>无法读取“{0}”——文件可能已损坏。</value></data>
+  <data name="ManagePacks_Section" xml:space="preserve"><value>节点包</value></data>
+  <data name="ManagePacks_AddFromFile" xml:space="preserve"><value>从文件添加…</value></data>
+  <data name="ManagePacks_Info" xml:space="preserve"><value>描述调色板中可用节点类型的清单。</value></data>
+  <data name="ManagePacks_Regenerate" xml:space="preserve"><value>重新生成</value></data>
+  <data name="ManagePacks_Generator" xml:space="preserve"><value>生成器</value></data>
+  <data name="ManagePacks_Generate" xml:space="preserve"><value>从项目生成…</value></data>
+  <data name="ManagePacks_Generating" xml:space="preserve"><value>正在生成节点包…</value></data>
+  <data name="ManagePacks_TrustTitle" xml:space="preserve"><value>信任此项目？</value></data>
+  <data name="ManagePacks_TrustMessage" xml:space="preserve"><value>构建“{0}”可能会运行自定义构建步骤和节点构造函数。请仅对可信来源继续。</value></data>
+  <data name="ManagePacks_GenerationFailed" xml:space="preserve"><value>节点包生成失败。</value></data>
+  <data name="ManagePacks_InvalidManifest" xml:space="preserve"><value>生成器未产生有效且非空的清单。</value></data>
+  <data name="ManagePacks_Generated" xml:space="preserve"><value>节点包“{0}”已生成（{1} 个类型）。</value></data>
+  <data name="ManagePacks_Cancelled" xml:space="preserve"><value>生成已取消。</value></data>
+  <data name="ManagePacks_TypeCount" xml:space="preserve"><value>{0} 个类型</value></data>
+  <data name="ManagePacks_None" xml:space="preserve"><value>没有额外的包 — 仅加载编辑器内置节点。</value></data>
+  <data name="Notice_AssetReadFailed" xml:space="preserve"><value>无法读取资源“{0}”——已跳过。</value></data>
+  <data name="Notice_NewerSchema" xml:space="preserve"><value>文件“{0}”来自更新版本的编辑器（架构 {1}）。保存时可能丢失部分数据。</value></data>
+  <data name="Notice_DuplicateOutputName" xml:space="preserve"><value>节点类型“{0}”多次声明输出“{1}” — 仅使用第一个。</value></data>
+  <data name="Notice_ExecMustBePort" xml:space="preserve"><value>节点类型“{0}”将 exec 输入“{1}”声明为字段或详细信息。该输入已作为端口加载。</value></data>
+  <data name="Notice_PackConflict" xml:space="preserve"><value>节点包“{0}”被加载了两次 — 已忽略第二份副本。</value></data>
+  <data name="Notice_TypeConflict" xml:space="preserve"><value>节点类型“{0}”同时由“{1}”和“{2}”声明 — 使用来自“{1}”的那个。</value></data>
+  <data name="Notice_PackLoadFailed" xml:space="preserve"><value>无法加载节点包“{0}”（{1}）— 其节点将显示为占位符。</value></data>
+  <data name="Notice_ManifestVersionNewer" xml:space="preserve"><value>清单“{0}”使用架构版本 {1}；此编辑器支持版本 {2}。已加载可识别的字段。</value></data>
+  <data name="Notice_PackWatchFailed" xml:space="preserve"><value>无法监视节点包“{0}”的更改（{1}）。</value></data>
+  <data name="Notice_MissingPack" xml:space="preserve"><value>节点包“{0}”未加载 — “{1}”中来自它的节点将显示为占位符。</value></data>
+  <data name="Notice_DeleteFailed" xml:space="preserve"><value>删除“{0}”失败。</value></data>
+  <data name="Notice_DuplicateFailed" xml:space="preserve"><value>复制“{0}”失败。</value></data>
+  <data name="Notice_DuplicateIdRepaired" xml:space="preserve"><value>发现重复的资源 ID——“{0}”已分配新 ID。</value></data>
+  <data name="Notice_DuplicateIdUnrepaired" xml:space="preserve"><value>在“{0}”中发现重复 ID，但无法修复（文件被锁定或为只读）。</value></data>
+  <data name="DetailsPanel_ExportFormat" xml:space="preserve"><value>导出格式</value></data>
+  <data name="Validation_MissingTemplate" xml:space="preserve"><value>此实例的模板缺失：{0}</value></data>
+  <data name="Notice_Saved" xml:space="preserve"><value>已保存：{0}</value></data>
+  <data name="Notice_ExportMissingSubgraph" xml:space="preserve"><value>导出：缺少子图“{0}”</value></data>
+  <data name="Notice_ExportSubgraphLoadFailed" xml:space="preserve"><value>导出：无法加载子图“{0}”</value></data>
+  <data name="Notice_SubgraphCreated" xml:space="preserve"><value>已创建子图“{0}”</value></data>
+  <data name="Notice_SubgraphCreateFailed" xml:space="preserve"><value>无法创建子图“{0}”</value></data>
+  <data name="Notice_TemplateCreated" xml:space="preserve"><value>已创建模板“{0}”</value></data>
+  <data name="Notice_TemplateCreateFailed" xml:space="preserve"><value>无法创建模板“{0}”</value></data>
+  <data name="Dialog_CreateTemplate" xml:space="preserve"><value>创建缺失的模板</value></data>
+  <data name="Problems_Action_CreateTemplate" xml:space="preserve"><value>创建模板…</value></data>
+  <data name="Problems_Empty" xml:space="preserve"><value>未发现问题</value></data>
+  <data name="Problems_ClearAll" xml:space="preserve"><value>清除</value></data>
+  <data name="Problems_Source_Validation" xml:space="preserve"><value>验证</value></data>
+  <data name="Problems_Source_Operation" xml:space="preserve"><value>操作</value></data>
+  <data name="Problems_Action_CreateSubgraph" xml:space="preserve"><value>创建子图…</value></data>
+  <data name="Dialog_CreateSubgraph" xml:space="preserve"><value>创建缺失的子图</value></data>
+  <data name="Dialog_CreateSubgraph_Name" xml:space="preserve"><value>名称</value></data>
+  <data name="Dialog_CreateSubgraph_Location" xml:space="preserve"><value>库</value></data>
+  <data name="Dialog_CreateSubgraph_NoRoots" xml:space="preserve"><value>请先添加库文件夹（文件 ▸ 管理库）</value></data>
+  <data name="Dialog_Create" xml:space="preserve"><value>创建</value></data>
+</root>

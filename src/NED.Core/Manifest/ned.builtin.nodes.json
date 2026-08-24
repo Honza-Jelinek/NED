@@ -1,0 +1,168 @@
+{
+  "ManifestVersion": 1,
+  "Pack": {
+    "Id": "ned",
+    "Name": "NED built-in nodes",
+    "Version": "1.0.0"
+  },
+  "Enums": [
+    {
+      "Id": "ned/InputExposure",
+      "Values": [
+        "Port",
+        "Field"
+      ]
+    }
+  ],
+  "Types": [
+    {
+      "Id": "ned/ExecEntry",
+      "Name": "Exec Entry",
+      "Category": "Flow",
+      "Color": "#3758CC",
+      "Icon": "\u25B6",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Then",
+          "Type": "exec",
+          "Multiple": false
+        }
+      ],
+      "Inputs": []
+    },
+    {
+      "Id": "ned/GraphInputNode",
+      "Name": "Input",
+      "Category": "Interface",
+      "Color": "#2F958E",
+      "Icon": "\u25B8",
+      "Extends": [],
+      "Outputs": [
+        {
+          "Name": "Out",
+          "Type": "ned/GraphInputNode",
+          "Multiple": false
+        }
+      ],
+      "Inputs": [
+        {
+          "Name": "Name",
+          "Label": "Name",
+          "Kind": "Field",
+          "Type": "string",
+          "Default": "In",
+          "HasExplicitDefault": true,
+          "Multiple": false,
+          "Optional": true,
+          "Details": false,
+          "TypePicker": false
+        },
+        {
+          "Name": "InputTypeName",
+          "Label": "Type",
+          "Kind": "Field",
+          "Type": "string",
+          "Default": "double",
+          "HasExplicitDefault": true,
+          "Multiple": false,
+          "Optional": true,
+          "Details": true,
+          "TypePicker": true
+        },
+        {
+          "Name": "Multiple",
+          "Label": "List",
+          "Kind": "Field",
+          "Type": "bool",
+          "Default": false,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": true,
+          "TypePicker": false
+        },
+        {
+          "Name": "Exposure",
+          "Label": "Expose",
+          "Kind": "Field",
+          "Type": "ned/InputExposure",
+          "Default": "Port",
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": true,
+          "TypePicker": false
+        },
+        {
+          "Name": "DefaultValue",
+          "Label": "Default",
+          "Kind": "Field",
+          "Type": "string",
+          "Default": "",
+          "HasExplicitDefault": true,
+          "Multiple": false,
+          "Optional": true,
+          "Details": true,
+          "TypePicker": false
+        },
+        {
+          "Name": "Order",
+          "Label": "Order",
+          "Kind": "Field",
+          "Type": "int",
+          "Default": 0,
+          "HasExplicitDefault": false,
+          "Multiple": false,
+          "Optional": false,
+          "Details": true,
+          "TypePicker": false
+        },
+        {
+          "Name": "Description",
+          "Label": "Description",
+          "Kind": "Field",
+          "Type": "string",
+          "Default": "",
+          "HasExplicitDefault": true,
+          "Multiple": false,
+          "Optional": true,
+          "Details": true,
+          "TypePicker": false
+        }
+      ]
+    },
+    {
+      "Id": "ned/OutputNode",
+      "Name": "Output",
+      "Category": "Output",
+      "Color": "#3758CC",
+      "Icon": "\u27A4",
+      "Extends": [],
+      "Outputs": [],
+      "Inputs": []
+    },
+    {
+      "Id": "ned/ReturnNode",
+      "Name": "Return",
+      "Category": "Flow",
+      "Color": "#3758CC",
+      "Icon": "\u21A9",
+      "Extends": [],
+      "Outputs": [],
+      "Inputs": [
+        {
+          "Name": "$exec",
+          "Label": "In",
+          "Kind": "Port",
+          "Type": "exec",
+          "HasExplicitDefault": false,
+          "Multiple": true,
+          "Optional": false,
+          "Details": false,
+          "TypePicker": false
+        }
+      ]
+    }
+  ]
+}

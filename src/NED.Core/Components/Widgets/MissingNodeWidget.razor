@@ -1,0 +1,114 @@
+@namespace NED.Core
+@* Widget pro MissingNodeModel — placeholder za node s nerozpoznaným typem.
+   Zobrazuje uložená data jen pro ilustraci (read-only): původní typ, field hodnoty,
+   vstupní porty odvozené z linků a output port. Data drží původní DTO, takže
+   save nic neztratí. *@
+@using System.Text.Json
+@inject IStringLocalizer<Strings> Loc
+
+@{
+    IReadOnlyList<ValidationIssue> issues = Bridge?.IssuesFor(Node) ?? Array.Empty<ValidationIssue>();
+    var hasError = issues.Any(i => i.Severity == IssueSeverity.Error);
+    var hasWarn = issues.Any(i => i.Severity == IssueSeverity.Warning);
+    var vCls = hasError ? " node-invalid" : hasWarn ? " node-warn" : "";
+    var rootCls = $"data-node dn-missing{(Node.Selected ? " node-selected" : "")}{vCls}";
+}
+
+<div class="@rootCls">
+
+    @if (issues.Count > 0)
+    {
+        <NedTooltip Description="@IssueText(issues)" Placement="Placement.Right">
+            <div class="dn-badge @(hasError ? "dn-badge-err" : "dn-badge-warn")">@issues.Count</div>
+        </NedTooltip>
+    }
+
+    @* ── Header ── *@
+    <NedTooltip Description="@Node.Dto.TypeName" Placement="Placement.Top">
+        <div class="dn-header" style="@HeaderStyle">
+            <span class="dn-icon">⚠</span>
+            <span class="dn-title">@Node.ShortTypeName</span>
+        </div>
+    </NedTooltip>
+
+    @* ── Porty: vstupy vlevo (odvozené z linků), output vpravo ── *@
+    <div class="dn-ports" @onmousedown:stopPropagation>
+        <div class="dn-inputs">
+            @foreach (var (name, port) in Node.InputPorts
+                .OrderByDescending(item => item.Value.DataType == NED.Abstractions.Manifest.TypeIds.Exec))
+            {
+                var rowCls = "dn-port-row dn-in-row"
+                    + (port.DataType == NED.Abstractions.Manifest.TypeIds.Exec ? " dn-exec" : "")
+                    + (port.Links.Count > 0 ? " dn-conn" : "");
+                <NedTooltip TypeLine="@port.TypeLine" Placement="Placement.Left">
+                    <div class="@rowCls" style="--pc:@MissingColor">
+                        <PortRenderer Port="port" />
+                        @if (Node.Outputs.Count > 1)
+                            {
+                                @* Jméno má smysl jen tam, kde je z čeho vybírat.
+                                   U jediného výstupu je to text navíc na každém uzlu v grafu. *@
+                                <span class="dn-port-label">@name</span>
+                            }
+                    </div>
+                </NedTooltip>
+            }
+        </div>
+        <div class="dn-outputs">
+            @foreach (var (name, output) in Node.Outputs
+                .OrderByDescending(item => item.Value.DataType == NED.Abstractions.Manifest.TypeIds.Exec))
+            {
+                var outCls = "dn-port-row dn-out-row"
+                    + (output.DataType == NED.Abstractions.Manifest.TypeIds.Exec ? " dn-exec" : "")
+                    + (output.Links.Count > 0 ? " dn-conn" : "");
+                <NedTooltip TypeLine="@output.TypeLine" Placement="Placement.Right">
+                    <div class="@outCls" style="--pc:@MissingColor">
+                        <span class="dn-port-label">@name</span>
+                        <PortRenderer Port="output" />
+                    </div>
+                </NedTooltip>
+            }
+        </div>
+    </div>
+
+    @* ── Read-only výpis uložených dat (jen ilustrace, žádné inputy) ── *@
+    <div class="dn-body" @onmousedown:stopPropagation>
+        <div class="dn-missing-type">@Loc["MissingNode_MissingType"]: @Node.Dto.TypeName</div>
+
+        @foreach (var (key, value) in Node.Dto.Fields)
+        {
+            <div class="dn-field">
+                <label class="dn-field-label">@key</label>
+                <span class="dn-field-ro">@FormatValue(value)</span>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public MissingNodeModel Node { get; set; } = null!;
+
+    /// <summary>Můstek do NedCanvas (validační issues). Cascaduje se shora.</summary>
+    [CascadingParameter] public NodeEditorBridge? Bridge { get; set; }
+
+    private const string MissingColor = "#CC252B";
+
+    private string HeaderStyle => $"background-color:{MissingColor};";
+
+    /// <summary>Hodnota z DTO (po deserializaci JsonElement) → čitelný text.</summary>
+    private static string FormatValue(object? value) => value switch
+    {
+        null => "—",
+        JsonElement je => je.ValueKind switch
+        {
+            JsonValueKind.Null or JsonValueKind.Undefined => "—",
+            JsonValueKind.String => je.GetString() ?? "",
+            _ => je.GetRawText(),
+        },
+        _ => value.ToString() ?? "",
+    };
+
+    private string IssueText(IReadOnlyList<ValidationIssue> issues) =>
+        string.Join("\n", issues.Select(i => i.Args is { Length: > 0 }
+            ? string.Format(Loc[i.MessageKey], i.Args)
+            : Loc[i.MessageKey].Value));
+}

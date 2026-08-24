@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="xml:space" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>1.3</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="File_New" xml:space="preserve"><value>Nouveau</value></data>
+  <data name="File_Save" xml:space="preserve"><value>Enregistrer</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="NedMenuBar_File" xml:space="preserve"><value>Fichier</value></data>
+  <data name="NedMenuBar_Edit" xml:space="preserve"><value>Éditer</value></data>
+  <data name="NedMenuBar_Window" xml:space="preserve"><value>Fenêtre</value></data>
+  <data name="Window_Language" xml:space="preserve"><value>Langue</value></data>
+  <data name="File_Open" xml:space="preserve"><value>Ouvrir</value></data>
+  <data name="File_SaveAs" xml:space="preserve"><value>Enregistrer sous…</value></data>
+  <data name="File_Export" xml:space="preserve"><value>Exporter</value></data>
+  <data name="File_ManageLibraries" xml:space="preserve"><value>Gérer les bibliothèques</value></data>
+  <data name="Edit_Undo" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Edit_Redo" xml:space="preserve"><value>Rétablir</value></data>
+  <data name="ManageLibraries_Info1" xml:space="preserve"><value>Les bibliothèques sont des dossiers qui sont analysés pour</value></data>
+  <data name="ManageLibraries_Info2" xml:space="preserve"><value>Les sous-graphes indexés apparaîtront dans la palette.</value></data>
+  <data name="ManageLibraries_NoLibrary" xml:space="preserve"><value>Aucune bibliothèque pour le moment.</value></data>
+  <data name="ManageLibraries_FolderPath" xml:space="preserve"><value>Chemin du dossier</value></data>
+  <data name="ManageLibraries_Browse" xml:space="preserve"><value>Parcourir</value></data>
+  <data name="ManageLibraries_Add" xml:space="preserve"><value>Ajouter</value></data>
+  <data name="HomeScreen_Subtitle" xml:space="preserve"><value>Créez un nouveau graphique ou ouvrez un fichier existant</value></data>
+  <data name="HomeScreen_NewGraphTitle" xml:space="preserve"><value>Nouveau graphique</value></data>
+  <data name="HomeScreen_NewGraphDesc" xml:space="preserve"><value>Créer une toile vierge</value></data>
+  <data name="HomeScreen_OpenFileTitle" xml:space="preserve"><value>Ouvrir un fichier</value></data>
+  <data name="HomeScreen_OpenFileDesc" xml:space="preserve"><value>Charger un diagramme existant</value></data>
+  <data name="TextPromptDialog_Label" xml:space="preserve"><value>Étiquette</value></data>
+  <data name="TextPromptDialog_OkText" xml:space="preserve"><value>OK</value></data>
+  <data name="TextPromptDialog_Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="PortContextMenu_ConvertToField" xml:space="preserve"><value>Convertir en champ</value></data>
+  <data name="PortContextMenu_ConvertToPort" xml:space="preserve"><value>Convertir en port</value></data>
+  <data name="NodeContextMenu_Duplicate" xml:space="preserve"><value>Dupliquer</value></data>
+  <data name="NodeContextMenu_Refresh" xml:space="preserve"><value>Actualiser</value></data>
+  <data name="NodeContextMenu_Delete" xml:space="preserve"><value>Supprimer</value></data>
+  <data name="InstanceEditor_Instance" xml:space="preserve"><value>Instance</value></data>
+  <data name="InstanceEditor_NameLabel" xml:space="preserve"><value>Nom</value></data>
+  <data name="InstanceEditor_NamePlaceholder" xml:space="preserve"><value>facultatif</value></data>
+  <data name="InstanceEditor_TemplateNotFound" xml:space="preserve"><value>Modèle introuvable dans la bibliothèque.</value></data>
+  <data name="InstanceEditor_NoInputs" xml:space="preserve"><value>Ce modèle n'a aucun paramètre d'entrée。</value></data>
+  <data name="Validation_MissingType" xml:space="preserve"><value>Type de nœud manquant : {0}</value></data>
+  <data name="MissingNode_MissingType" xml:space="preserve"><value>Type manquant</value></data>
+  <data name="Notice_SaveFailed" xml:space="preserve"><value>Échec de l'enregistrement de « {0} ».</value></data>
+  <data name="Notice_ExportFailed" xml:space="preserve"><value>Échec de l'exportation de « {0} ».</value></data>
+  <data name="Notice_FileReadFailed" xml:space="preserve"><value>Impossible de lire « {0} » — il est peut-être corrompu.</value></data>
+  <data name="ManagePacks_Section" xml:space="preserve"><value>Packs de nœuds</value></data>
+  <data name="ManagePacks_AddFromFile" xml:space="preserve"><value>Ajouter depuis un fichier…</value></data>
+  <data name="ManagePacks_Info" xml:space="preserve"><value>Manifestes décrivant les types de nœuds disponibles dans la palette.</value></data>
+  <data name="ManagePacks_Regenerate" xml:space="preserve"><value>Régénérer</value></data>
+  <data name="ManagePacks_Generator" xml:space="preserve"><value>Générateur</value></data>
+  <data name="ManagePacks_Generate" xml:space="preserve"><value>Générer depuis un projet…</value></data>
+  <data name="ManagePacks_Generating" xml:space="preserve"><value>Génération du pack de nœuds…</value></data>
+  <data name="ManagePacks_TrustTitle" xml:space="preserve"><value>Faire confiance à ce projet ?</value></data>
+  <data name="ManagePacks_TrustMessage" xml:space="preserve"><value>La compilation de "{0}" peut exécuter des étapes personnalisées et des constructeurs de nœuds. Continuez uniquement avec une source fiable.</value></data>
+  <data name="ManagePacks_GenerationFailed" xml:space="preserve"><value>La génération du pack de nœuds a échoué.</value></data>
+  <data name="ManagePacks_InvalidManifest" xml:space="preserve"><value>Le générateur n'a pas produit de manifeste valide et non vide.</value></data>
+  <data name="ManagePacks_Generated" xml:space="preserve"><value>Pack "{0}" généré ({1} types).</value></data>
+  <data name="ManagePacks_Cancelled" xml:space="preserve"><value>Génération annulée.</value></data>
+  <data name="ManagePacks_TypeCount" xml:space="preserve"><value>{0} types</value></data>
+  <data name="ManagePacks_None" xml:space="preserve"><value>Aucun pack supplémentaire — seuls les nœuds intégrés sont chargés.</value></data>
+  <data name="Notice_AssetReadFailed" xml:space="preserve"><value>Impossible de lire la ressource « {0} » — ignorée.</value></data>
+  <data name="Notice_NewerSchema" xml:space="preserve"><value>Le fichier « {0} » provient d'une version plus récente de l'éditeur (schéma {1}). Des données peuvent être perdues à l'enregistrement.</value></data>
+  <data name="Notice_DuplicateOutputName" xml:space="preserve"><value>Le type de nœud « {0} » déclare la sortie « {1} » plusieurs fois — seule la première est utilisée.</value></data>
+  <data name="Notice_ExecMustBePort" xml:space="preserve"><value>Le type de nœud « {0} » déclare l’entrée exec « {1} » comme champ ou détail. Elle a été chargée comme port.</value></data>
+  <data name="Notice_PackConflict" xml:space="preserve"><value>Le pack de nœuds « {0} » est chargé deux fois — la seconde copie a été ignorée.</value></data>
+  <data name="Notice_TypeConflict" xml:space="preserve"><value>Le type de nœud « {0} » est déclaré par « {1} » et « {2} » — celui de « {1} » est utilisé.</value></data>
+  <data name="Notice_PackLoadFailed" xml:space="preserve"><value>Le pack de nœuds « {0} » n'a pas pu être chargé ({1}) — ses nœuds apparaîtront comme des espaces réservés.</value></data>
+  <data name="Notice_ManifestVersionNewer" xml:space="preserve"><value>Le manifeste « {0} » utilise la version de schéma {1} ; cet éditeur prend en charge la version {2}. Les champs connus ont été chargés.</value></data>
+  <data name="Notice_PackWatchFailed" xml:space="preserve"><value>Les changements du pack de nœuds « {0} » ne peuvent pas être surveillés ({1}).</value></data>
+  <data name="Notice_MissingPack" xml:space="preserve"><value>Le pack de nœuds « {0} » n'est pas chargé — ses nœuds dans « {1} » apparaissent comme des espaces réservés.</value></data>
+  <data name="Notice_DeleteFailed" xml:space="preserve"><value>Échec de la suppression de « {0} ».</value></data>
+  <data name="Notice_DuplicateFailed" xml:space="preserve"><value>Échec de la duplication de « {0} ».</value></data>
+  <data name="Notice_DuplicateIdRepaired" xml:space="preserve"><value>ID de ressource dupliqué détecté — « {0} » a reçu un nouvel ID.</value></data>
+  <data name="Notice_DuplicateIdUnrepaired" xml:space="preserve"><value>ID dupliqué détecté dans « {0} », mais impossible de le corriger (fichier verrouillé ou en lecture seule).</value></data>
+  <data name="DetailsPanel_ExportFormat" xml:space="preserve"><value>Format d'export</value></data>
+  <data name="Validation_MissingTemplate" xml:space="preserve"><value>Le modèle de cette instance est manquant : {0}</value></data>
+  <data name="Notice_Saved" xml:space="preserve"><value>Enregistré : {0}</value></data>
+  <data name="Notice_ExportMissingSubgraph" xml:space="preserve"><value>Export : sous-graphe manquant « {0} »</value></data>
+  <data name="Notice_ExportSubgraphLoadFailed" xml:space="preserve"><value>Export : impossible de charger le sous-graphe « {0} »</value></data>
+  <data name="Notice_SubgraphCreated" xml:space="preserve"><value>Sous-graphe « {0} » créé</value></data>
+  <data name="Notice_SubgraphCreateFailed" xml:space="preserve"><value>Impossible de créer le sous-graphe « {0} »</value></data>
+  <data name="Notice_TemplateCreated" xml:space="preserve"><value>Modèle « {0} » créé</value></data>
+  <data name="Notice_TemplateCreateFailed" xml:space="preserve"><value>Impossible de créer le modèle « {0} »</value></data>
+  <data name="Dialog_CreateTemplate" xml:space="preserve"><value>Créer le modèle manquant</value></data>
+  <data name="Problems_Action_CreateTemplate" xml:space="preserve"><value>Créer un modèle…</value></data>
+  <data name="Problems_Empty" xml:space="preserve"><value>Aucun problème détecté</value></data>
+  <data name="Problems_ClearAll" xml:space="preserve"><value>Effacer</value></data>
+  <data name="Problems_Source_Validation" xml:space="preserve"><value>Validation</value></data>
+  <data name="Problems_Source_Operation" xml:space="preserve"><value>Opération</value></data>
+  <data name="Problems_Action_CreateSubgraph" xml:space="preserve"><value>Créer un sous-graphe…</value></data>
+  <data name="Dialog_CreateSubgraph" xml:space="preserve"><value>Créer le sous-graphe manquant</value></data>
+  <data name="Dialog_CreateSubgraph_Name" xml:space="preserve"><value>Nom</value></data>
+  <data name="Dialog_CreateSubgraph_Location" xml:space="preserve"><value>Bibliothèque</value></data>
+  <data name="Dialog_CreateSubgraph_NoRoots" xml:space="preserve"><value>Ajoutez d'abord un dossier de bibliothèque (Fichier ▸ Gérer les bibliothèques)</value></data>
+  <data name="Dialog_Create" xml:space="preserve"><value>Créer</value></data>
+</root>

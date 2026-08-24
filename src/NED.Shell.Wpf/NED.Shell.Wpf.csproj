@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>NED.Shell.Wpf</RootNamespace>
+    <AssemblyName>NED.Shell.Wpf</AssemblyName>
+    <ApplicationIcon>wwwroot\ned icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="10.0.100" />
+    <PackageReference Include="Z.Blazor.Diagrams" Version="3.0.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NED.Core\NED.Core.csproj" />
+    <ProjectReference Include="..\NED.Manifest.Generator\NED.Manifest.Generator.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <Target Name="CopyManifestGenerator" AfterTargets="Build">
+    <ItemGroup>
+      <_ManifestGeneratorFiles Include="..\NED.Manifest.Generator\bin\$(Configuration)\net10.0\*" />
+    </ItemGroup>
+    <Error Condition="'@(_ManifestGeneratorFiles)' == ''" Text="ned-manifest build output was not found. Check the generator target framework and CopyManifestGenerator path." />
+    <Copy SourceFiles="@(_ManifestGeneratorFiles)" DestinationFolder="$(OutDir)tools\ned-manifest" SkipUnchangedFiles="true" />
+  </Target>
+
+  <!--
+    Node packy se dodávají jako manifesty, ne jako reference na assembly. Editor tak
+    o doméně neví vůbec nic — to je celý smysl refaktoru (docs/14-manifest.md).
+    Přegenerování: .\generate-manifests.ps1
+  -->
+  <ItemGroup>
+    <None Include="..\Sandbox\Sandbox.nodes.json" Link="manifests\Sandbox.nodes.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\LICENSE" Link="LICENSE" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\THIRD-PARTY-NOTICES.md" Link="THIRD-PARTY-NOTICES.md" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\licenses\*.txt" Link="licenses\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

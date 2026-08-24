@@ -1,0 +1,26 @@
+{
+  "fallback": { "color": "#377799", "icon": "•" },
+
+  "categories": {
+    "Math":   { "color": "#377799", "icon": "∑" },
+    "String": { "color": "#2F958E", "icon": "Ab" },
+    "Bool":   { "color": "#B97D1B", "icon": "✓" },
+    "Output": { "color": "#3758CC", "icon": "➤" }
+  },
+
+  "portColors": {
+    "any":     "#8395A3",
+    "int":     "#4FB286",
+    "long":    "#4FB286",
+    "short":   "#4FB286",
+    "byte":    "#4FB286",
+    "double":  "#8BAF55",
+    "float":   "#8BAF55",
+    "decimal": "#8BAF55",
+    "string":  "#B768A0",
+    "bool":    "#C84A50",
+    "object":  "#3C8FB3",
+    "enum":    "#2F958E",
+    "struct":  "#4B6FB5"
+  }
+}

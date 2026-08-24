@@ -1,0 +1,15 @@
+/* Host base reset. Generický styling editoru žije v NED.Core/ned.css
+   (servíruje se jako _content/NED.Core/ned.css). Tady nic node-specifického! */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0b0c14;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+#app { height: 100%; }
